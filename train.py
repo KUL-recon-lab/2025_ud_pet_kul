@@ -12,10 +12,10 @@ from models import UNet3D
 
 ds = [10]
 patch_size = 64
-queue_length = 1000
-samples_per_volume = 8
-n_sub = 20
-batch_size = 6
+queue_length = 5000
+samples_per_volume = 100
+n_sub = 100
+batch_size = 10
 lr = 3e-4
 num_epochs = 100
 
@@ -69,7 +69,6 @@ for epoch in range(1, num_epochs + 1):
     batch_losses = torch.zeros(len(training_patches_loader))
     batch_psnr = torch.zeros(len(training_patches_loader))
     for batch_idx, patches_batch in enumerate(training_patches_loader):
-        print(batch_idx)
         inputs = patches_batch["d10"][tio.DATA].to(device)
         targets = patches_batch["ref"][tio.DATA].to(device)
 
@@ -98,4 +97,15 @@ for epoch in range(1, num_epochs + 1):
     psnr_std = batch_psnr.std().item()
     print(
         f"\nEpoch [{epoch:04}/{num_epochs:04}] train loss: {loss_avg:.2E} +- {loss_std:.2E} train PSNR: {psnr_avg:.2f} +- {psnr_std:.2f}"
+    )
+
+    torch.save(
+        {
+            "model_state_dict": model.state_dict(),
+            "optimizer_state_dict": optimizer.state_dict(),
+            "train_loss": train_loss_avg[epoch - 1],
+            "train_psnr": train_psnr_avg[epoch - 1],
+            "epoch": epoch,
+        },
+        f"unet3d_epoch{epoch:04}.pth",
     )
