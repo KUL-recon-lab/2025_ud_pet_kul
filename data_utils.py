@@ -57,7 +57,6 @@ if __name__ == "__main__":
             vol = nii_hdr.get_fdata()
 
             suv_vol = vol * suv_fac
-            # suv_vol_scaled = 0.5 * np.log(1 + suv_vol / 0.5)
             suv_vol_scaled = np.log(1 + suv_vol)
 
             # create an empty text file that shows that we have seen this case
