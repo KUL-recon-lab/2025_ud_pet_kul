@@ -1,4 +1,4 @@
-# TODO: interpolation, sampling mask
+# TODO: interpolation
 
 import pydicom
 import torch
@@ -90,6 +90,7 @@ def get_subject_dict(s_dir: Path, ds: list[int], **kwargs):
     subject_dict = {}
     subject_dict["suv_fac"] = suv_fac
     subject_dict["ref"] = tio.ScalarImage(ref_nii_file)
+    subject_dict["ds"] = ds
 
     for d in ds:
         d_dir = sorted(list(s_dir.glob(f"*D{d}")))[0]
@@ -97,69 +98,3 @@ def get_subject_dict(s_dir: Path, ds: list[int], **kwargs):
         subject_dict[f"d{d}"] = tio.ScalarImage(dfile)
 
     return subject_dict
-
-
-if __name__ == "__main__":
-    show = False
-    ds = [10]
-
-    m_path = Path(
-        "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/Shanghai-Ruijin-Hospital-2023/nifti_out"
-    )
-
-    s_dirs = sorted([x for x in m_path.iterdir() if x.is_dir()])
-
-    subjects_list = []
-    refs = []
-
-    for i, s_dir in enumerate(s_dirs[:16]):
-        print(i, s_dir)
-        subject_dict = get_subject_dict(s_dir, ds)
-        subject = tio.Subject(subject_dict)
-        subjects_list.append(subject)
-
-    transform = tio.Compose(
-        [tio.transforms.ToCanonical(), SUVLogCompress(), AddSamplingMap()]
-    )
-    subjects_dataset = tio.SubjectsDataset(subjects_list, transform=transform)
-
-    patch_size = 128
-    queue_length = 300
-    samples_per_volume = 32
-    batch_size = 32
-    sampler = tio.data.WeightedSampler(
-        probability_map="sampling_map", patch_size=patch_size
-    )
-
-    # %%
-    patches_queue = tio.Queue(
-        subjects_dataset,
-        queue_length,
-        samples_per_volume,
-        sampler,
-        num_workers=4,
-    )
-
-    patches_loader = tio.SubjectsLoader(
-        patches_queue,
-        batch_size=batch_size,
-        num_workers=0,  # this must be 0
-    )
-
-    for ib, patches_batch in enumerate(patches_loader):
-        print(ib)
-        inputs = patches_batch["d10"][tio.DATA]  # key 't1' is in subject
-        targets = patches_batch["ref"][tio.DATA]  # key 'brain' is in subject
-
-    # %%
-    if show:
-        import pymirc.viewer as pv
-
-        ims = dict(vmin=0, vmax=3.5)
-
-        for s in subjects_dataset:
-            vi = pv.ThreeAxisViewer(
-                [s[x].data.numpy().squeeze() for x in ["ref"] + [f"d{d}" for d in ds]],
-                imshow_kwargs=ims,
-            )
-            breakpoint()
