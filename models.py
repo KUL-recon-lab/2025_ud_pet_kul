@@ -1,12 +1,11 @@
+from typing import List, Tuple, Optional
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
 
 class DoubleConv(nn.Module):
-    """(Conv3d → BatchNorm3d → ReLU) × 2"""
-
-    def __init__(self, in_ch, out_ch):
+    def __init__(self, in_ch: int, out_ch: int):
         super().__init__()
         self.net = nn.Sequential(
             nn.Conv3d(in_ch, out_ch, kernel_size=3, padding=1, bias=False),
@@ -17,26 +16,34 @@ class DoubleConv(nn.Module):
             nn.ReLU(inplace=True),
         )
 
-    def forward(self, x):
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
         return self.net(x)
 
 
 class UpSampleConv(nn.Module):
-    """Upsample by 2× with interpolate, then DoubleConv on concatenated features."""
-
-    def __init__(self, in_ch, out_ch, mode="trilinear", align_corners=False):
+    def __init__(
+        self,
+        in_ch: int,
+        out_ch: int,
+        mode: str = "trilinear",
+        align_corners: Optional[bool] = False,
+    ):
         super().__init__()
-        # in_ch = channels from lower-res + skip channels
         self.double_conv = DoubleConv(in_ch, out_ch)
         self.mode = mode
         self.align_corners = align_corners
 
-    def forward(self, x, skip):
-        # 1) Upsample
+    def forward(self, x: torch.Tensor, skip: torch.Tensor) -> torch.Tensor:
+        # TorchScript-friendly interpolate
+        sz = [int(s * 2) for s in x.shape[2:]]
         x = F.interpolate(
-            x, scale_factor=2, mode=self.mode, align_corners=self.align_corners
+            x,
+            size=sz,
+            mode=self.mode,
+            align_corners=self.align_corners,
+            recompute_scale_factor=False,
         )
-        # 2) If needed, pad to match skip size (odd dimensions)
+        # pad if needed
         if x.shape[2:] != skip.shape[2:]:
             diffZ = skip.size(2) - x.size(2)
             diffY = skip.size(3) - x.size(3)
@@ -52,23 +59,19 @@ class UpSampleConv(nn.Module):
                     diffZ - diffZ // 2,
                 ],
             )
-        # 3) Concatenate and convolve
         x = torch.cat([skip, x], dim=1)
         return self.double_conv(x)
 
 
 class UNet3D(nn.Module):
-    """3D U-Net architecture for image to image mappings"""
-
     def __init__(
         self,
-        in_channels=1,
-        out_channels=1,
-        features=[16, 32, 64],
+        in_channels: int = 1,
+        out_channels: int = 1,
+        features: List[int] = [16, 32, 64],
     ):
         super().__init__()
 
-        # Encoder
         self.downs = nn.ModuleList()
         self.pools = nn.ModuleList()
         prev_ch = in_channels
@@ -77,31 +80,19 @@ class UNet3D(nn.Module):
             self.pools.append(nn.MaxPool3d(kernel_size=2, stride=2))
             prev_ch = feat
 
-        # Bottleneck
         self.bottleneck = DoubleConv(features[-1], features[-1] * 2)
 
-        # Decoder (using interpolate + conv)
         self.ups = nn.ModuleList()
-        for feat in reversed(features):
-            # in channels = feat*2 (from bottleneck or prev up) + feat (skip)
+        for feat in list(reversed(features)):
             self.ups.append(UpSampleConv(feat * 2 + feat, feat))
 
-        # Final 1×1×1 conv
         self.final_conv = nn.Conv3d(features[0], out_channels, kernel_size=1)
 
-    def forward(self, x):
-        # PET images can have arbitrary global scales, but we don't want to
-        # normalize before calculating the log-likelihood gradient
-        # instead we calculate scales of all images in the batch and apply
-        # them only before using the neural network
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        input_x = x
+        skips: List[torch.Tensor] = []
 
-        # as scale we use the mean of the input images
-        # if we are using early stopped OSEM images, the mean is well defined
-
-        input_x = x  # Save the original input
-
-        skips = []
-        # Encoder path
+        # Encoder — iterate modules directly (no integer indexing)
         for down, pool in zip(self.downs, self.pools):
             x = down(x)
             skips.append(x)
@@ -110,10 +101,10 @@ class UNet3D(nn.Module):
         # Bottleneck
         x = self.bottleneck(x)
 
-        # Decoder path
-        for up, skip in zip(self.ups, reversed(skips)):
+        # Decoder — enumerate ups; index only into the *tensor* list (ok)
+        for idx, up in enumerate(self.ups):
+            skip = skips[len(skips) - 1 - idx]
             x = up(x, skip)
 
         unet_out = self.final_conv(x)
-
         return input_x + unet_out

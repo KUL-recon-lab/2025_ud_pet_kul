@@ -14,10 +14,11 @@ ds = [10]
 patch_size = 64
 queue_length = 5000
 samples_per_volume = 100
-n_sub = 100
+n_sub = 1  # 100
 batch_size = 10
 lr = 3e-4
-num_epochs = 100
+num_epochs = 1  # 100
+model_kwargs = dict(in_channels=1, out_channels=1)
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -55,7 +56,7 @@ training_patches_loader = tio.SubjectsLoader(
 )
 
 # %%
-model = UNet3D(in_channels=1, out_channels=1).to(device)
+model = UNet3D(**model_kwargs).to(device)
 optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 criterion = torch.nn.MSELoss()
 psnr = PeakSignalNoiseRatio(data_range=(0, 1)).to(device)
