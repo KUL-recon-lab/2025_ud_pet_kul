@@ -1,0 +1,12 @@
+name: 2025_udpet
+channels:
+  - conda-forge
+dependencies:
+  - python==3.12
+  - pytorch==2.8 
+  - torchio==0.20
+  - torchmetrics==1.8
+  - pymirc==0.30
+  - wandb==0.22
+  - tqdm==4.67
+  - ipython==9.6
