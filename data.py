@@ -79,7 +79,7 @@ class AddSamplingMap(tio.Transform):
         return subject
 
 
-def get_subject_dict(s_dir: Path, ds: list[int], **kwargs):
+def get_subject_dict(s_dir: Path, crfs: list[int], **kwargs):
     ref_dir = sorted(list(s_dir.glob("*NORMAL")))[0]
 
     dcm_file = ref_dir / "_sample.dcm"
@@ -90,11 +90,11 @@ def get_subject_dict(s_dir: Path, ds: list[int], **kwargs):
     subject_dict = {}
     subject_dict["suv_fac"] = suv_fac
     subject_dict["ref"] = tio.ScalarImage(ref_nii_file)
-    subject_dict["ds"] = ds
+    subject_dict["crfs"] = crfs
 
-    for d in ds:
+    for d in crfs:
         d_dir = sorted(list(s_dir.glob(f"*D{d}")))[0]
         dfile = sorted(list(d_dir.glob("*.nii.gz")))[0]
-        subject_dict[f"d{d}"] = tio.ScalarImage(dfile)
+        subject_dict[f"crf{d}"] = tio.ScalarImage(dfile)
 
     return subject_dict

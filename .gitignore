@@ -1,5 +1,7 @@
 *.pth
 run*/*
+train_psnr.txt
+*.pt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
