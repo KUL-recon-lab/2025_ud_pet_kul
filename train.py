@@ -14,11 +14,14 @@ ds = [10]
 patch_size = 64
 queue_length = 5000
 samples_per_volume = 100
-n_sub = 1  # 100
+n_sub = 100
 batch_size = 10
-lr = 3e-4
-num_epochs = 1  # 100
+lr = 1e-3
+num_epochs = 100
 model_kwargs = dict(in_channels=1, out_channels=1)
+
+# %%
+num_workers = 12
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -45,7 +48,7 @@ training_patches_queue = tio.Queue(
     queue_length,
     samples_per_volume,
     training_sampler,
-    num_workers=8,
+    num_workers=num_workers,
     verbose=True,
 )
 
@@ -64,9 +67,10 @@ psnr = PeakSignalNoiseRatio(data_range=(0, 1)).to(device)
 train_loss_avg = torch.zeros(num_epochs)
 train_psnr_avg = torch.zeros(num_epochs)
 
-# training loop
-model.train()
 for epoch in range(1, num_epochs + 1):
+    ############################################################################
+    # training loop
+    model.train()
     batch_losses = torch.zeros(len(training_patches_loader))
     batch_psnr = torch.zeros(len(training_patches_loader))
     for batch_idx, patches_batch in enumerate(training_patches_loader):
@@ -110,3 +114,16 @@ for epoch in range(1, num_epochs + 1):
         },
         f"unet3d_epoch{epoch:04}.pth",
     )
+
+    with open("train_psnr.txt", "w") as f:
+        f.write("\n".join(map(str, train_psnr_avg[:epoch].tolist())))
+
+    # end of training loop
+    ############################################################################
+
+    try:
+        model.eval()
+        scripted_model = torch.jit.script(model)
+        scripted_model.save(f"unet3d_epoch{epoch:04}_scripted.pt")
+    except Exception as e:
+        print(f"Could not export model to TorchScript: {e}")
