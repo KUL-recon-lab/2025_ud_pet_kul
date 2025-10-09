@@ -42,7 +42,7 @@ aggregator = tio.inference.GridAggregator(grid_sampler)
 
 # load the model from torch script
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-model = torch.jit.load("run3/unet3d_epoch0020_scripted.pt", map_location=device)
+model = torch.jit.load("model_0001_scripted.pt", map_location=device)
 
 model.eval()
 with torch.no_grad():

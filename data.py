@@ -71,6 +71,9 @@ class AddSamplingMap(tio.Transform):
     def apply_transform(self, subject: tio.Subject) -> tio.Subject:
         ref = subject["ref"]
         weights = (ref.data > 0.1).to(torch.int8)
+        # set the weight to one in the first 128 slice such that once in a while
+        # we sample an empty patch
+        weights[..., :129] = 1
         subject["sampling_map"] = tio.Image(
             tensor=weights,
             affine=ref.affine,
@@ -79,22 +82,16 @@ class AddSamplingMap(tio.Transform):
         return subject
 
 
-def get_subject_dict(s_dir: Path, crfs: list[int], **kwargs):
-    ref_dir = sorted(list(s_dir.glob("*NORMAL")))[0]
-
-    dcm_file = ref_dir / "_sample.dcm"
+def get_subject_dict(s_dir: Path, crfs: list[str], **kwargs):
+    dcm_file = s_dir / "ref" / "_sample.dcm"
     suv_fac = get_suv_factor_from_dicom(dcm_file, **kwargs)
-
-    ref_nii_file = sorted(list(ref_dir.glob("*.nii.gz")))[0]
 
     subject_dict = {}
     subject_dict["suv_fac"] = suv_fac
-    subject_dict["ref"] = tio.ScalarImage(ref_nii_file)
     subject_dict["crfs"] = crfs
 
     for d in crfs:
-        d_dir = sorted(list(s_dir.glob(f"*D{d}")))[0]
-        dfile = sorted(list(d_dir.glob("*.nii.gz")))[0]
-        subject_dict[f"crf{d}"] = tio.ScalarImage(dfile)
+        dfile = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))[0]
+        subject_dict[f"{d}"] = tio.ScalarImage(dfile)
 
     return subject_dict

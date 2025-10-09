@@ -81,6 +81,7 @@ class UNet3D(nn.Module):
             prev_ch = feat
 
         self.bottleneck = DoubleConv(features[-1], features[-1] * 2)
+        self.final_relu = nn.ReLU()
 
         self.ups = nn.ModuleList()
         for feat in list(reversed(features)):
@@ -106,5 +107,5 @@ class UNet3D(nn.Module):
             skip = skips[len(skips) - 1 - idx]
             x = up(x, skip)
 
-        unet_out = self.final_conv(x)
-        return input_x + unet_out
+        # add final Relu to guarantee non-negative output
+        return self.final_relu(input_x + self.final_conv(x))
