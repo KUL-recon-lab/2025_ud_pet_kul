@@ -254,30 +254,7 @@ class ThreeAxisViewer:
                 self._ax_ctrl_cmap, ["Greys", "jet", "plasma", "magma"]
             )
 
-        # apply settings to all images
-        def _apply_clim_and_cmap():
-            imgs = [
-                getattr(self, "_img_i", None),
-                getattr(self, "_img_j", None),
-                getattr(self, "_img_k", None),
-                getattr(self, "_img_mcor", None),
-                getattr(self, "_img_msag", None),
-            ]
-            for im in imgs:
-                if im is None:
-                    continue
-                try:
-                    im.set_clim(self._vmin, self._vmax)
-                except Exception:
-                    pass
-                try:
-                    im.set_cmap(self._cmap)
-                except Exception:
-                    pass
-            try:
-                self.redraw_all()
-            except Exception:
-                pass
+        # (see method self._apply_clim_and_cmap) -- updates images and redraws
 
         # textbox callbacks
         def _on_vmin_text(val):
@@ -296,7 +273,7 @@ class ThreeAxisViewer:
                     self._textbox_vmax.set_val(str(self._vmax))
                 except Exception:
                     pass
-            _apply_clim_and_cmap()
+            self._apply_clim_and_cmap()
 
         def _on_vmax_text(val):
             try:
@@ -311,7 +288,7 @@ class ThreeAxisViewer:
                     self._textbox_vmin.set_val(str(self._vmin))
                 except Exception:
                     pass
-            _apply_clim_and_cmap()
+            self._apply_clim_and_cmap()
 
         self._textbox_vmin.on_submit(_on_vmin_text)
         self._textbox_vmax.on_submit(_on_vmax_text)
@@ -327,7 +304,7 @@ class ThreeAxisViewer:
                     except Exception:
                         sel = label
                     self._cmap = sel
-                    _apply_clim_and_cmap()
+                    self._apply_clim_and_cmap()
 
                 self._dropdown_cmap.on_changed(_on_dropdown)
             except Exception:
@@ -335,12 +312,15 @@ class ThreeAxisViewer:
                 self._radio_cmap.on_clicked(
                     lambda label: (
                         setattr(self, "_cmap", label),
-                        _apply_clim_and_cmap(),
+                        self._apply_clim_and_cmap(),
                     )
                 )
         else:
             self._radio_cmap.on_clicked(
-                lambda label: (setattr(self, "_cmap", label), _apply_clim_and_cmap())
+                lambda label: (
+                    setattr(self, "_cmap", label),
+                    self._apply_clim_and_cmap(),
+                )
             )
 
         # show control panel
@@ -568,6 +548,44 @@ class ThreeAxisViewer:
         self.redraw_img_i()
         self.redraw_img_j()
         self.redraw_img_k()
+
+    def _apply_clim_and_cmap(self):
+        """Apply current vmin/vmax and cmap to all image artists and redraw.
+
+        This updates the main orthogonal views plus the multi-planar (msag/mcor)
+        images if they exist.
+        """
+        imgs = [
+            getattr(self, "_img_i", None),
+            getattr(self, "_img_j", None),
+            getattr(self, "_img_k", None),
+            getattr(self, "_img_mcor", None),
+            getattr(self, "_img_msag", None),
+        ]
+        figs = []
+        for im in imgs:
+            if im is None:
+                continue
+            try:
+                im.set_clim(self._vmin, self._vmax)
+            except Exception:
+                pass
+            try:
+                im.set_cmap(self._cmap)
+            except Exception:
+                pass
+            try:
+                figs.append(im.axes.figure)
+            except Exception:
+                pass
+
+        # redraw unique figures
+        for f in set(figs):
+            try:
+                plt.figure(f.number)
+                plt.draw()
+            except Exception:
+                pass
 
     def on_scroll(self, event):
         if event.inaxes == self._ax_i:
@@ -897,6 +915,11 @@ class ThreeAxisViewer:
             manager.canvas.figure for manager in Gcf.get_all_fig_managers()
         ]:
             plt.close(self._fig_msag)
+
+        if self._fig_ctrl in [
+            manager.canvas.figure for manager in Gcf.get_all_fig_managers()
+        ]:
+            plt.close(self._fig_ctrl)
 
     def savefigs(self, base: str, **kwargs):
         if self._fig_i in [
