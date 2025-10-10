@@ -805,6 +805,52 @@ class ThreeAxisViewer:
             self.ig = (self._ig - 1) % self._ng
         elif event.key == "up":
             self.ig = (self._ig + 1) % self._ng
+        # quick vmax presets: keys '1'..'9' set vmax to that number
+        elif isinstance(event.key, str) and event.key.isdigit() and len(event.key) == 1:
+            val = int(event.key)
+            if 1 <= val <= 9:
+                self._vmax = float(val)
+                # update textbox if present
+                try:
+                    if (
+                        hasattr(self, "_textbox_vmax")
+                        and self._textbox_vmax is not None
+                    ):
+                        self._textbox_vmax.set_val(str(self._vmax))
+                except Exception:
+                    pass
+                # apply to images
+                try:
+                    # reuse existing helper if available
+                    _apply = None
+                    if "_apply_clim_and_cmap" in locals():
+                        _apply = locals()["_apply_clim_and_cmap"]
+                    if _apply is None and hasattr(self, "_textbox_vmin"):
+                        # call the same logic as TextBox callbacks: apply settings
+                        imgs = [
+                            getattr(self, "_img_i", None),
+                            getattr(self, "_img_j", None),
+                            getattr(self, "_img_k", None),
+                            getattr(self, "_img_mcor", None),
+                            getattr(self, "_img_msag", None),
+                        ]
+                        for im in imgs:
+                            if im is None:
+                                continue
+                            try:
+                                im.set_clim(self._vmin, self._vmax)
+                            except Exception:
+                                pass
+                            try:
+                                im.set_cmap(self._cmap)
+                            except Exception:
+                                pass
+                        try:
+                            plt.draw()
+                        except Exception:
+                            pass
+                except Exception:
+                    pass
 
     def connect_key_events(self):
         self._cif_key_i = self._fig_i.canvas.mpl_connect(
