@@ -97,6 +97,7 @@ class ThreeAxisViewer:
         )
         self._img_k = self._ax_k.imshow(
             self._volume[self._ig, self._it, :, :, self._k].T,
+            origin="lower",
             **self._kwargs,
             aspect=self._aspect_ratio_k,
         )

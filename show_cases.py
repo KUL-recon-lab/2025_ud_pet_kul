@@ -26,7 +26,7 @@ for i, sub in enumerate(training_subjects_dataset):
     # compressed_vol = np.flip(sub["ref"].data.squeeze().numpy(), (0, 1))
     # vol = np.exp(compressed_vol) - 1
 
-    compressed_vol = sub["ref"].data.squeeze()
+    compressed_vol = torch.flip(sub["ref"].data.squeeze(), axis=0)
     vol = torch.expm1(compressed_vol)
 
     v = ThreeAxisViewer(vol, affine=sub["ref"].affine, vmin=0, vmax=7, cmap="Greys")
