@@ -102,8 +102,31 @@ def psnr(output, targets, data_range: float):
     # compute psnr per sample in batch
     # pnsr of torchmetrics has memory leak
     mse_per_elem = F.mse_loss(output, targets, reduction="none")
+    # spatial/channel dims to reduce to per-sample values
     dims = tuple(range(1, mse_per_elem.ndim))
+
+    # per-sample MSE
     mse_per_sample = mse_per_elem.mean(dim=dims)
+
+    # Exclude samples where the target is completely empty (all zeros)
+    target_min = targets.amin(dim=dims)
+    target_max = targets.amax(dim=dims)
+    valid_target_mask = ~((target_min == 0) & (target_max == 0))
+
+    # Also exclude samples where mse is exactly zero (would lead to inf PSNR)
+    nonzero_mse_mask = mse_per_sample != 0
+
+    mask = valid_target_mask & nonzero_mse_mask
+
+    # If no valid samples remain, return NaN to indicate undefined PSNR
+    if mask.numel() == 0 or mask.sum() == 0:
+        return float("nan")
+
+    breakpoint()
+
+    mse_per_sample = mse_per_sample[mask]
+
     psnr_per_sample = 10 * torch.log10((data_range**2) / mse_per_sample)
 
-    return psnr_per_sample
+    # return mean PSNR across valid samples as float
+    return psnr_per_sample.mean().item()
