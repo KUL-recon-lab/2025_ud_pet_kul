@@ -83,7 +83,9 @@ class AddSamplingMap(tio.Transform):
         return subject
 
 
-def get_subject_dict(s_dir: Path, crfs: list[str], **kwargs):
+def get_subject_dict(
+    s_dir: Path, crfs: list[str], target_voxel_size: float = 1.65, **kwargs
+):
     dcm_file = s_dir / "ref" / "_sample.dcm"
     suv_fac = get_suv_factor_from_dicom(dcm_file, **kwargs)
 
@@ -93,9 +95,16 @@ def get_subject_dict(s_dir: Path, crfs: list[str], **kwargs):
     subject_dict["s_dir"] = s_dir
 
     for d in crfs:
+        # updated version
+        # dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}.nii.gz"
         dfile = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))[0]
         subject_dict[f"{d}_file"] = dfile
         subject_dict[f"{d}"] = tio.ScalarImage(dfile)
+
+    # uncommend with new data
+    # subject_dict["sampling_map"] = (
+    #    s_dir / f"sampling_map_{target_voxel_size:.2f}.nii.gz"
+    # )
 
     return subject_dict
 

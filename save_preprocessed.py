@@ -1,18 +1,16 @@
-import argparse
+import torch
 import torchio as tio
 
 from pathlib import Path
-from data import SUVLogCompress, get_subject_dict, AddSamplingMap, psnr
+from data import get_subject_dict, AddSamplingMap
 
 target_voxsize_mm = 1.65
 
 
 m_path = Path("/tmp/nifti_out")
 
-# HACK only first 2 images
 s_dirs = sorted([x for x in m_path.iterdir() if x.is_dir()])
-
-img_keys = ["10", "100", "ref"]
+img_keys = ["4", "10", "20", "50", "100", "ref"]
 
 subjects_list = [
     tio.Subject(get_subject_dict(s_dir, crfs=img_keys)) for s_dir in s_dirs
@@ -30,6 +28,7 @@ training_subjects_dataset = tio.SubjectsDataset(
 for i, sub in enumerate(training_subjects_dataset):
     for img_key in img_keys:
         img = sub[img_key]
+        assert img.data.dtype == torch.float32
         new_file = (
             sub[f"{img_key}_file"].parent / f"resampled_{target_voxsize_mm:.2f}.nii.gz"
         )

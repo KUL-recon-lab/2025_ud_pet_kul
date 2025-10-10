@@ -7,4 +7,5 @@ dependencies:
   - torchio==0.20
   - pymirc==0.30
   - wandb==0.22
+  - indexed_gzip==1.10
   - ipython==9.6
