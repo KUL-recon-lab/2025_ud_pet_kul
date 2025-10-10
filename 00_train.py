@@ -4,13 +4,8 @@ import json
 import torch
 import torchio as tio
 
-from torchmetrics.image import PeakSignalNoiseRatio
 from pathlib import Path
-from data import (
-    SUVLogCompress,
-    get_subject_dict,
-    AddSamplingMap,
-)
+from data import SUVLogCompress, get_subject_dict, AddSamplingMap, psnr
 from models import UNet3D
 from datetime import datetime
 
@@ -19,11 +14,11 @@ parser.add_argument(
     "--count_reduction_factor", type=int, default=10, help="Count reduction factor"
 )
 parser.add_argument("--patch_size", type=int, default=64, help="Patch size")
-parser.add_argument("--queue_length", type=int, default=10000, help="Queue length")
+parser.add_argument("--queue_length", type=int, default=1000, help="Queue length")
 parser.add_argument(
     "--samples_per_volume", type=int, default=100, help="Samples per volume"
 )
-parser.add_argument("--n_sub", type=int, default=200, help="Number of subjects")
+parser.add_argument("--n_sub", type=int, default=100, help="Number of subjects")
 parser.add_argument("--batch_size", type=int, default=20, help="Batch size")
 parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
 parser.add_argument("--num_epochs", type=int, default=20, help="Number of epochs")
@@ -67,23 +62,18 @@ normalized_data_range = 3.5
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-m_path = Path(
-    "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/nifti_out"
-)
+m_path = Path("/tmp/nifti_out")
 
-s_dirs = sorted([x for x in m_path.iterdir() if x.is_dir()])
-#### HACK
-random.seed(42)  # for reproducibility
-subset_dirs = random.sample(s_dirs, n_sub)
+s_dirs = sorted([x for x in m_path.iterdir() if x.is_dir()])[:n_sub]
+
 subjects_list = [
     tio.Subject(get_subject_dict(s_dir, crfs=[str(count_reduction_factor), "ref"]))
-    for s_dir in subset_dirs
+    for s_dir in s_dirs
 ]
-### END HACK
 
 # save subset_dirs to file output_dir/subset_dirs.json
 with open(output_dir / "training_dirs.json", "w") as f:
-    json.dump([str(s) for s in subset_dirs], f, indent=4)
+    json.dump([str(s) for s in s_dirs], f, indent=4)
 
 
 # setup preprocessing transforms
@@ -121,7 +111,6 @@ if num_epochs > 0:
     model = UNet3D(**model_kwargs).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = torch.nn.MSELoss()
-    psnr = PeakSignalNoiseRatio(data_range=(0, normalized_data_range)).to(device)
 
     train_loss_avg = torch.zeros(num_epochs)
     train_psnr_avg = torch.zeros(num_epochs)
@@ -136,17 +125,20 @@ if num_epochs > 0:
             inputs = patches_batch[str(count_reduction_factor)][tio.DATA].to(device)
             targets = patches_batch["ref"][tio.DATA].to(device)
 
-            optimizer.zero_grad()
             output = model(inputs)
+
             loss = criterion(output, targets)
             loss.backward()
-
             optimizer.step()
+            optimizer.zero_grad()
+
             batch_losses[batch_idx] = loss.item()
-            batch_psnr[batch_idx] = psnr(output, targets)
+            batch_psnr[batch_idx] = (
+                psnr(output, targets, data_range=normalized_data_range).mean().item()
+            )
 
             print(
-                f"Epoch [{epoch:04}/{num_epochs:04}] Batch [{(batch_idx+1):03}/{len(training_patches_loader):03}] - tr. loss: {loss.item():.2E}",
+                f"Epoch [{epoch:04}/{num_epochs:04}] Batch [{(batch_idx+1):03}/{len(training_patches_loader):03}] - loss: {loss.item():.2E} - PSNR: {batch_psnr[batch_idx]:.2f}",
                 end="\r",
             )
 
@@ -189,7 +181,7 @@ if num_epochs > 0:
         )
 
         # end of training loop
-        ############################################################################
+        ###########################################################################
 
         try:
             model.eval()

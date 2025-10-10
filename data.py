@@ -2,6 +2,7 @@
 
 import pydicom
 import torch
+import torch.nn.functional as F
 import torchio as tio
 
 from pathlib import Path
@@ -95,3 +96,14 @@ def get_subject_dict(s_dir: Path, crfs: list[str], **kwargs):
         subject_dict[f"{d}"] = tio.ScalarImage(dfile)
 
     return subject_dict
+
+
+def psnr(output, targets, data_range: float):
+    # compute psnr per sample in batch
+    # pnsr of torchmetrics has memory leak
+    mse_per_elem = F.mse_loss(output, targets, reduction="none")
+    dims = tuple(range(1, mse_per_elem.ndim))
+    mse_per_sample = mse_per_elem.mean(dim=dims)
+    psnr_per_sample = 10 * torch.log10((data_range**2) / mse_per_sample)
+
+    return psnr_per_sample
