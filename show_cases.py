@@ -32,3 +32,4 @@ for i, sub in enumerate(training_subjects_dataset):
     v = ThreeAxisViewer(vol, affine=sub["ref"].affine, vmin=0, vmax=7, cmap="Greys")
 
     breakpoint()
+    v.close()

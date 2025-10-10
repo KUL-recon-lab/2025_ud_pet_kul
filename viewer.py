@@ -686,6 +686,16 @@ class ThreeAxisViewer:
         ]:
             plt.close(self._fig_k)
 
+        if self._fig_mcor in [
+            manager.canvas.figure for manager in Gcf.get_all_fig_managers()
+        ]:
+            plt.close(self._fig_mcor)
+
+        if self._fig_msag in [
+            manager.canvas.figure for manager in Gcf.get_all_fig_managers()
+        ]:
+            plt.close(self._fig_msag)
+
     def savefigs(self, base: str, **kwargs):
         if self._fig_i in [
             manager.canvas.figure for manager in Gcf.get_all_fig_managers()
