@@ -90,9 +90,11 @@ def get_subject_dict(s_dir: Path, crfs: list[str], **kwargs):
     subject_dict = {}
     subject_dict["suv_fac"] = suv_fac
     subject_dict["crfs"] = crfs
+    subject_dict["s_dir"] = s_dir
 
     for d in crfs:
         dfile = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))[0]
+        subject_dict[f"{d}_file"] = dfile
         subject_dict[f"{d}"] = tio.ScalarImage(dfile)
 
     return subject_dict

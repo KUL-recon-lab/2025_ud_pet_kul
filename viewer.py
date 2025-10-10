@@ -83,6 +83,14 @@ class ThreeAxisViewer:
             1, 1, figsize=(self._fig_k_width, self._fig_k_height), layout="constrained"
         )
 
+        self._fig_mcor, self._ax_mcor = plt.subplots(
+            1, 1, figsize=(self._fig_j_width, self._fig_j_height), layout="constrained"
+        )
+
+        self._fig_msag, self._ax_msag = plt.subplots(
+            1, 1, figsize=(self._fig_i_width, self._fig_i_height), layout="constrained"
+        )
+
         self._img_i = self._ax_i.imshow(
             self._volume[self._ig, self._it, self._i, :, :].T,
             origin="lower",
@@ -102,6 +110,20 @@ class ThreeAxisViewer:
             aspect=self._aspect_ratio_k,
         )
 
+        self._img_msag = self._ax_msag.imshow(
+            xp.max(self._volume[self._ig, self._it, :, :, :], axis=0).T,
+            origin="lower",
+            aspect=self._aspect_ratio_i,
+            **self._kwargs,
+        )
+
+        self._img_mcor = self._ax_mcor.imshow(
+            xp.max(self._volume[self._ig, self._it, :, :, :], axis=1).T,
+            origin="lower",
+            aspect=self._aspect_ratio_i,
+            **self._kwargs,
+        )
+
         self._ax_i.set_title(
             f"[g={self._ig},t={self._it},i={self._i},j,k]", fontsize="small"
         )
@@ -110,6 +132,13 @@ class ThreeAxisViewer:
         )
         self._ax_k.set_title(
             f"[g={self._ig},t={self._it},i,j,k={self._k}]", fontsize="small"
+        )
+
+        self._ax_msag.set_title(
+            f"[g={self._ig},t={self._it}, ...] mip", fontsize="small"
+        )
+        self._ax_mcor.set_title(
+            f"[g={self._ig},t={self._it}, ...] mip", fontsize="small"
         )
 
         if show_axis_labels:
@@ -126,7 +155,13 @@ class ThreeAxisViewer:
                 axx.tick_params(axis="x", labelsize="small")
                 axx.tick_params(axis="y", labelsize="small")
 
-            for axx in [self._ax_i, self._ax_j, self._ax_k]:
+            for axx in [
+                self._ax_i,
+                self._ax_j,
+                self._ax_k,
+                self._ax_mcor,
+                self._ax_msag,
+            ]:
                 axx.set_xticks([])
                 axx.set_yticks([])
 
@@ -134,13 +169,23 @@ class ThreeAxisViewer:
             cbar_i = self._fig_i.colorbar(self._img_i, ax=self._ax_i, **cbar_kws)
             cbar_j = self._fig_j.colorbar(self._img_j, ax=self._ax_j, **cbar_kws)
             cbar_k = self._fig_k.colorbar(self._img_k, ax=self._ax_k, **cbar_kws)
+            cbar_mcor = self._fig_mcor.colorbar(
+                self._img_mcor, ax=self._ax_mcor, **cbar_kws
+            )
+            cbar_msag = self._fig_msag.colorbar(
+                self._img_msag, ax=self._ax_msag, **cbar_kws
+            )
             cbar_i.ax.tick_params(labelsize="small")
             cbar_j.ax.tick_params(labelsize="small")
             cbar_k.ax.tick_params(labelsize="small")
+            cbar_mcor.ax.tick_params(labelsize="small")
+            cbar_msag.ax.tick_params(labelsize="small")
 
         self._fig_i.show()
         self._fig_j.show()
         self._fig_k.show()
+        self._fig_mcor.show()
+        self._fig_msag.show()
 
         # add interactivity
         self.connect_scroll_events()
@@ -397,13 +442,51 @@ class ThreeAxisViewer:
         )
 
     def on_button_press(self, event):
-        # start dragging if press was inside one of our axes
+        # determine which axis was clicked
         if event.inaxes == self._ax_i:
-            self._drag_axis = "i"
+            axis = "i"
         elif event.inaxes == self._ax_j:
-            self._drag_axis = "j"
+            axis = "j"
         elif event.inaxes == self._ax_k:
-            self._drag_axis = "k"
+            axis = "k"
+        else:
+            axis = None
+
+        # LEFT CLICK (button 1): jump orthogonal views to clicked coords
+        if axis is not None and getattr(event, "button", None) == 1:
+            x = event.xdata
+            y = event.ydata
+            if x is None or y is None:
+                return
+            if axis == "i":
+                # ax_i: x -> j, y -> k (no flips applied)
+                j = int(round(x))
+                k = int(round(y))
+                j = max(0, min(self._n_j - 1, j))
+                k = max(0, min(self._n_k - 1, k))
+                self.j = j
+                self.k = k
+            elif axis == "j":
+                # ax_j: x -> i, y -> k
+                i = int(round(x))
+                k = int(round(y))
+                i = max(0, min(self._n_i - 1, i))
+                k = max(0, min(self._n_k - 1, k))
+                self.i = i
+                self.k = k
+            elif axis == "k":
+                # ax_k: x -> j, y -> i
+                j = int(round(x))
+                i = int(round(y))
+                j = max(0, min(self._n_j - 1, j))
+                i = max(0, min(self._n_i - 1, i))
+                self.j = j
+                self.i = i
+            return
+
+        # RIGHT CLICK (button 3): start dragging to change slices
+        if axis is not None and getattr(event, "button", None) == 3:
+            self._drag_axis = axis
         else:
             self._drag_axis = None
 
