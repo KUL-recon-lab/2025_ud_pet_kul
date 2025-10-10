@@ -30,6 +30,7 @@ for i, sub in enumerate(training_subjects_dataset):
     vol = torch.expm1(compressed_vol)
 
     v = ThreeAxisViewer(vol, affine=sub["ref"].affine, vmin=0, vmax=7, cmap="Greys")
+    v.distribute_figures()
 
     breakpoint()
     v.close()

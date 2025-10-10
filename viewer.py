@@ -712,6 +712,126 @@ class ThreeAxisViewer:
         ]:
             self._fig_k.savefig(base + f"_k{self.k}.png", **kwargs)
 
+    def distribute_figures(
+        self, margin: int = 0, cols: int | None = None, include_mip: bool = True
+    ):
+        """Arrange this viewer's figures on screen in a tiled layout.
+
+        Parameters
+        - margin: pixels of margin between tiles and screen edges
+        - cols: number of columns; if None, a square-like layout is chosen
+        - include_mip: whether to include the mcor/msag figures in the tiling
+
+        This tries to support common GUI backends (Qt, Tk). If the backend
+        doesn't expose window geometry controls, the call is a no-op.
+        """
+        figs = [self._fig_i, self._fig_j, self._fig_k]
+        if include_mip:
+            # some viewers might not have mcor/msag (be defensive)
+            if hasattr(self, "_fig_mcor") and self._fig_mcor is not None:
+                figs.append(self._fig_mcor)
+            if hasattr(self, "_fig_msag") and self._fig_msag is not None:
+                figs.append(self._fig_msag)
+
+        figs = [
+            f
+            for f in figs
+            if f in [m.canvas.figure for m in Gcf.get_all_fig_managers()]
+        ]
+        n = len(figs)
+        if n == 0:
+            return
+
+        # Force a single-row layout: distribute horizontally only
+        cols = n
+        rows = 1
+
+        # Determine screen size from first figure's manager if possible
+        sw = None
+        sh = None
+        mgr = figs[0].canvas.manager
+        win = getattr(mgr, "window", None)
+        if win is not None:
+            # Qt backend
+            try:
+                scr = win.screen()
+                geom = scr.availableGeometry()
+                sw, sh = int(geom.width()), int(geom.height())
+            except Exception:
+                # Tk backend
+                try:
+                    sw = int(win.winfo_screenwidth())
+                    sh = int(win.winfo_screenheight())
+                except Exception:
+                    sw, sh = None, None
+
+        # fallback to a reasonable default if we couldn't get screen size
+        if sw is None or sh is None:
+            try:
+                import ctypes
+
+                user32 = ctypes.windll.user32
+                sw, sh = int(user32.GetSystemMetrics(0)), int(
+                    user32.GetSystemMetrics(1)
+                )
+            except Exception:
+                sw, sh = 1920, 1080
+
+        # Position figures in one row without resizing: use current canvas size
+        x = margin
+        for idx, fig in enumerate(figs):
+            mgr = fig.canvas.manager
+            win = getattr(mgr, "window", None)
+            if win is None:
+                # skip if we can't access the window
+                continue
+
+            # try to get figure canvas size (pixels)
+            try:
+                w_px, h_px = fig.canvas.get_width_height()
+            except Exception:
+                w_px, h_px = None, None
+
+            # fallback to window/widget size getters
+            if w_px is None or h_px is None or w_px == 0 or h_px == 0:
+                try:
+                    # Qt style
+                    w_px = int(win.width())
+                    h_px = int(win.height())
+                except Exception:
+                    try:
+                        w_px = int(win.winfo_width())
+                        h_px = int(win.winfo_height())
+                    except Exception:
+                        # last resort: use a default canvas size
+                        w_px, h_px = 800, 600
+
+            # align to top: place window at the margin from the top edge
+            # (margin==0 will place the window at the very top)
+            y = int(margin)
+
+            # Try setting window position while preserving size
+            try:
+                win.setGeometry(int(x), int(y), int(w_px), int(h_px))
+            except Exception:
+                try:
+                    win.wm_geometry(f"{int(w_px)}x{int(h_px)}+{int(x)}+{int(y)}")
+                except Exception:
+                    try:
+                        win.geometry(f"{int(w_px)}x{int(h_px)}+{int(x)}+{int(y)}")
+                    except Exception:
+                        # can't position this window; skip it
+                        pass
+
+            # move to next column
+            x += w_px + margin
+
+        # small pause to allow window managers to catch up
+        try:
+            plt.pause(0.01)
+        except Exception:
+            pass
+
 
 class ThreeAxisViewerLinker:
     def __init__(self, viewers: list[ThreeAxisViewer]):
