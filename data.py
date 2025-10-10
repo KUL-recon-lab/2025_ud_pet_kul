@@ -95,16 +95,14 @@ def get_subject_dict(
     subject_dict["s_dir"] = s_dir
 
     for d in crfs:
-        # updated version
-        # dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}.nii.gz"
-        dfile = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))[0]
+        dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}.nii.gz"
+        # dfile = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))[0]
         subject_dict[f"{d}_file"] = dfile
         subject_dict[f"{d}"] = tio.ScalarImage(dfile)
 
-    # uncommend with new data
-    # subject_dict["sampling_map"] = (
-    #    s_dir / f"sampling_map_{target_voxel_size:.2f}.nii.gz"
-    # )
+    subject_dict["sampling_map"] = tio.ScalarImage(
+        s_dir / f"sampling_map_{target_voxel_size:.2f}.nii.gz"
+    )
 
     return subject_dict
 
