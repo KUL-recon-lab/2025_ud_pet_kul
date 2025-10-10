@@ -4,10 +4,9 @@ import torch
 import torchio as tio
 
 from pathlib import Path
-from data import SUVLogCompress, get_subject_dict, AddSamplingMap, psnr
+from data import get_subject_dict, psnr
 from models import UNet3D
 from datetime import datetime
-from time import time
 
 parser = argparse.ArgumentParser(description="Train 3D UNet on PET data")
 parser.add_argument(
@@ -77,15 +76,11 @@ with open(output_dir / "training_dirs.json", "w") as f:
 
 
 # setup preprocessing transforms
-transform_list = [tio.transforms.ToCanonical(), SUVLogCompress()]
+transform_list = [tio.transforms.ToCanonical()]
 
 training_subjects_dataset = tio.SubjectsDataset(
     subjects_list, transform=tio.Compose(transform_list)
 )
-
-from IPython import embed
-
-embed()
 
 training_sampler = tio.data.WeightedSampler(
     probability_map="sampling_map", patch_size=patch_size

@@ -107,6 +107,31 @@ def get_subject_dict(
     return subject_dict
 
 
+def get_subject_dict_old(
+    s_dir: Path, crfs: list[str], target_voxel_size: float = 1.65, **kwargs
+):
+    dcm_file = s_dir / "ref" / "_sample.dcm"
+    suv_fac = get_suv_factor_from_dicom(dcm_file, **kwargs)
+
+    subject_dict = {}
+    subject_dict["suv_fac"] = suv_fac
+    subject_dict["s_dir"] = s_dir
+
+    img_keys = []
+
+    for d in crfs:
+        dfiles = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))
+        if len(dfiles) > 0:
+            dfile = dfiles[0]
+            subject_dict[f"{d}_file"] = dfile
+            subject_dict[f"{d}"] = tio.ScalarImage(dfile)
+            img_keys.append(d)
+
+    subject_dict["crfs"] = img_keys
+
+    return subject_dict
+
+
 def psnr(output, targets, data_range: float):
     # compute psnr per sample in batch
     # pnsr of torchmetrics has memory leak
