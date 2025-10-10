@@ -122,8 +122,6 @@ def psnr(output, targets, data_range: float):
     if mask.numel() == 0 or mask.sum() == 0:
         return float("nan")
 
-    breakpoint()
-
     mse_per_sample = mse_per_sample[mask]
 
     psnr_per_sample = 10 * torch.log10((data_range**2) / mse_per_sample)
