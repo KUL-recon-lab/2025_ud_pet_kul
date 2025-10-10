@@ -43,6 +43,9 @@ target_voxsize_mm = args.target_voxsize_mm
 
 model_kwargs = dict(in_channels=1, out_channels=1)
 
+m_path = Path(
+    "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/nifti_out"
+)
 
 # %% create an output directory starting with run followed by a date-time stamp
 # dont use tio for date time stamp
@@ -60,8 +63,6 @@ num_workers = 10
 normalized_data_range = 3.5
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-m_path = Path("/tmp/nifti_out")
 
 s_dirs = sorted([x for x in m_path.iterdir() if x.is_dir()])[:n_sub]
 
