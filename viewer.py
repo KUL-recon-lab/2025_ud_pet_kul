@@ -144,6 +144,8 @@ class ThreeAxisViewer:
         # add interactivity
         self.connect_scroll_events()
         self.connect_key_events()
+        # allow changing slices by dragging the mouse
+        self.connect_drag_events()
 
         # for fig_i, fig_j, fig_k show a single x and y tick corresponding to the current i, j, k
         self._ax_i.set_xticks([self._j])
@@ -393,6 +395,119 @@ class ThreeAxisViewer:
             "scroll_event", self.on_scroll
         )
 
+    def on_button_press(self, event):
+        # start dragging if press was inside one of our axes
+        if event.inaxes == self._ax_i:
+            self._drag_axis = "i"
+        elif event.inaxes == self._ax_j:
+            self._drag_axis = "j"
+        elif event.inaxes == self._ax_k:
+            self._drag_axis = "k"
+        else:
+            self._drag_axis = None
+
+        if self._drag_axis is not None:
+            # store start position and start index
+            self._drag_start_y = event.y
+            self._drag_start_x = event.x
+            if self._drag_axis == "i":
+                self._drag_start_index = int(self._i)
+            elif self._drag_axis == "j":
+                self._drag_start_index = int(self._j)
+            elif self._drag_axis == "k":
+                self._drag_start_index = int(self._k)
+
+    def on_motion(self, event):
+        # only process if currently dragging and we have start state
+        if not hasattr(self, "_drag_axis") or self._drag_axis is None:
+            return
+        if not hasattr(self, "_drag_start_y") or self._drag_start_y is None:
+            return
+        if not hasattr(self, "_drag_start_index") or self._drag_start_index is None:
+            return
+        # event may be None or outside axes; just use y coordinate
+        try:
+            dy = event.y - self._drag_start_y
+        except Exception:
+            return
+
+        # sensitivity: number of pixels per slice change
+        pixels_per_slice = 6.0
+        delta = int(round(-dy / pixels_per_slice))
+
+        if self._drag_axis == "i":
+            new_i = (self._drag_start_index + delta) % self._n_i
+            if new_i != self._i:
+                self.i = new_i
+        elif self._drag_axis == "j":
+            new_j = (self._drag_start_index + delta) % self._n_j
+            if new_j != self._j:
+                self.j = new_j
+        elif self._drag_axis == "k":
+            new_k = (self._drag_start_index + delta) % self._n_k
+            if new_k != self._k:
+                self.k = new_k
+
+    def on_button_release(self, event):
+        self._drag_axis = None
+        self._drag_start_y = None
+        self._drag_start_x = None
+        self._drag_start_index = None
+
+    def connect_drag_events(self):
+        # connect press/motion/release for each figure
+        self._cid_press_i = self._fig_i.canvas.mpl_connect(
+            "button_press_event", self.on_button_press
+        )
+        self._cid_motion_i = self._fig_i.canvas.mpl_connect(
+            "motion_notify_event", self.on_motion
+        )
+        self._cid_release_i = self._fig_i.canvas.mpl_connect(
+            "button_release_event", self.on_button_release
+        )
+
+        self._cid_press_j = self._fig_j.canvas.mpl_connect(
+            "button_press_event", self.on_button_press
+        )
+        self._cid_motion_j = self._fig_j.canvas.mpl_connect(
+            "motion_notify_event", self.on_motion
+        )
+        self._cid_release_j = self._fig_j.canvas.mpl_connect(
+            "button_release_event", self.on_button_release
+        )
+
+        self._cid_press_k = self._fig_k.canvas.mpl_connect(
+            "button_press_event", self.on_button_press
+        )
+        self._cid_motion_k = self._fig_k.canvas.mpl_connect(
+            "motion_notify_event", self.on_motion
+        )
+        self._cid_release_k = self._fig_k.canvas.mpl_connect(
+            "button_release_event", self.on_button_release
+        )
+
+    def disconnect_drag_events(self):
+        if hasattr(self, "_cid_press_i") and hasattr(self, "_fig_i"):
+            self._fig_i.canvas.mpl_disconnect(self._cid_press_i)
+        if hasattr(self, "_cid_motion_i") and hasattr(self, "_fig_i"):
+            self._fig_i.canvas.mpl_disconnect(self._cid_motion_i)
+        if hasattr(self, "_cid_release_i") and hasattr(self, "_fig_i"):
+            self._fig_i.canvas.mpl_disconnect(self._cid_release_i)
+
+        if hasattr(self, "_cid_press_j") and hasattr(self, "_fig_j"):
+            self._fig_j.canvas.mpl_disconnect(self._cid_press_j)
+        if hasattr(self, "_cid_motion_j") and hasattr(self, "_fig_j"):
+            self._fig_j.canvas.mpl_disconnect(self._cid_motion_j)
+        if hasattr(self, "_cid_release_j") and hasattr(self, "_fig_j"):
+            self._fig_j.canvas.mpl_disconnect(self._cid_release_j)
+
+        if hasattr(self, "_cid_press_k") and hasattr(self, "_fig_k"):
+            self._fig_k.canvas.mpl_disconnect(self._cid_press_k)
+        if hasattr(self, "_cid_motion_k") and hasattr(self, "_fig_k"):
+            self._fig_k.canvas.mpl_disconnect(self._cid_motion_k)
+        if hasattr(self, "_cid_release_k") and hasattr(self, "_fig_k"):
+            self._fig_k.canvas.mpl_disconnect(self._cid_release_k)
+
     def disconnect_scroll_events(self):
         if hasattr(self, "_cid_scroll_i") and hasattr(self, "_fig_i"):
             self._fig_i.canvas.mpl_disconnect(self._cid_scroll_i)
@@ -400,6 +515,8 @@ class ThreeAxisViewer:
             self._fig_j.canvas.mpl_disconnect(self._cid_scroll_j)
         if hasattr(self, "_cid_scroll_k") and hasattr(self, "_fig_k"):
             self._fig_k.canvas.mpl_disconnect(self._cid_scroll_k)
+
+    # --- end single-viewer drag support ---
 
     def on_key_press(self, event):
         if event.key == "left":
@@ -477,6 +594,13 @@ class ThreeAxisViewerLinker:
             viewer.disconnect_scroll_events()
             viewer.disconnect_key_events()
 
+        # disable individual viewer drag events (we'll handle dragging centrally)
+        for viewer in self._viewers:
+            try:
+                viewer.disconnect_drag_events()
+            except Exception:
+                pass
+
         self.connect_scroll_events()
         self.connect_key_events()
 
@@ -484,6 +608,9 @@ class ThreeAxisViewerLinker:
         for viewer in self._viewers:
             viewer.connect_scroll_events()
             viewer.connect_key_events()
+
+        # enable linked drag handling
+        self.connect_drag_events()
 
     def on_scroll(self, event):
         if any([event.inaxes == x.ax_i for x in self._viewers]):
@@ -512,6 +639,100 @@ class ThreeAxisViewerLinker:
             viewer.fig_i.canvas.mpl_connect("scroll_event", self.on_scroll)
             viewer.fig_j.canvas.mpl_connect("scroll_event", self.on_scroll)
             viewer.fig_k.canvas.mpl_connect("scroll_event", self.on_scroll)
+
+    # Drag handling for linked viewers
+    def on_button_press(self, event):
+        # determine which axis the press occurred in (if any)
+        self._linked_drag_axis = None
+        for v in self._viewers:
+            if event.inaxes == v.ax_i:
+                self._linked_drag_axis = "i"
+                break
+            if event.inaxes == v.ax_j:
+                self._linked_drag_axis = "j"
+                break
+            if event.inaxes == v.ax_k:
+                self._linked_drag_axis = "k"
+                break
+
+        if self._linked_drag_axis is not None:
+            self._linked_drag_start_y = event.y
+            # store start indices for all viewers
+            self._linked_drag_start_indices = [(v.i, v.j, v.k) for v in self._viewers]
+
+    def on_motion(self, event):
+        if not hasattr(self, "_linked_drag_axis") or self._linked_drag_axis is None:
+            return
+        if (
+            not hasattr(self, "_linked_drag_start_y")
+            or self._linked_drag_start_y is None
+        ):
+            return
+        if (
+            not hasattr(self, "_linked_drag_start_indices")
+            or self._linked_drag_start_indices is None
+        ):
+            return
+
+        try:
+            dy = event.y - self._linked_drag_start_y
+        except Exception:
+            return
+
+        pixels_per_slice = 6.0
+        delta = int(round(-dy / pixels_per_slice))
+
+        # apply delta to the appropriate index for all viewers
+        if self._linked_drag_axis == "i":
+            for v, (si, sj, sk) in zip(self._viewers, self._linked_drag_start_indices):
+                new_i = (si + delta) % v.n_i
+                if new_i != v.i:
+                    v.i = new_i
+        elif self._linked_drag_axis == "j":
+            for v, (si, sj, sk) in zip(self._viewers, self._linked_drag_start_indices):
+                new_j = (sj + delta) % v.n_j
+                if new_j != v.j:
+                    v.j = new_j
+        elif self._linked_drag_axis == "k":
+            for v, (si, sj, sk) in zip(self._viewers, self._linked_drag_start_indices):
+                new_k = (sk + delta) % v.n_k
+                if new_k != v.k:
+                    v.k = new_k
+
+    def on_button_release(self, event):
+        self._linked_drag_axis = None
+        self._linked_drag_start_y = None
+        self._linked_drag_start_indices = None
+
+    def connect_drag_events(self):
+        for viewer in self._viewers:
+            viewer.fig_i.canvas.mpl_connect("button_press_event", self.on_button_press)
+            viewer.fig_i.canvas.mpl_connect("motion_notify_event", self.on_motion)
+            viewer.fig_i.canvas.mpl_connect(
+                "button_release_event", self.on_button_release
+            )
+
+            viewer.fig_j.canvas.mpl_connect("button_press_event", self.on_button_press)
+            viewer.fig_j.canvas.mpl_connect("motion_notify_event", self.on_motion)
+            viewer.fig_j.canvas.mpl_connect(
+                "button_release_event", self.on_button_release
+            )
+
+            viewer.fig_k.canvas.mpl_connect("button_press_event", self.on_button_press)
+            viewer.fig_k.canvas.mpl_connect("motion_notify_event", self.on_motion)
+            viewer.fig_k.canvas.mpl_connect(
+                "button_release_event", self.on_button_release
+            )
+
+    def disconnect_drag_events(self):
+        # We can't easily track connection ids here because they were not stored;
+        # instead, attempt to call each viewer's disconnect_drag_events so their
+        # callbacks are removed if they stored ids.
+        for viewer in self._viewers:
+            try:
+                viewer.disconnect_drag_events()
+            except Exception:
+                pass
 
     def on_key_press(self, event):
         if event.key == "left":
