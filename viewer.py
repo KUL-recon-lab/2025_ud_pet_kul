@@ -81,7 +81,10 @@ class ThreeAxisViewer:
             1, 1, figsize=(self._fig_j_width, self._fig_j_height), layout="constrained"
         )
         self._fig_k, self._ax_k = plt.subplots(
-            1, 1, figsize=(self._fig_k_width, self._fig_k_height), layout="constrained"
+            1,
+            1,
+            figsize=(1.5 * self._fig_k_width, 1.5 * self._fig_k_height),
+            layout="constrained",
         )
 
         self._fig_mcor, self._ax_mcor = plt.subplots(
@@ -650,8 +653,8 @@ class ThreeAxisViewer:
                 self.k = k
             elif axis == "k":
                 # ax_k: x -> j, y -> i
-                j = int(round(x))
-                i = int(round(y))
+                j = int(round(y))
+                i = int(round(x))
                 j = max(0, min(self._n_j - 1, j))
                 i = max(0, min(self._n_i - 1, i))
                 self.j = j
