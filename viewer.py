@@ -484,6 +484,35 @@ class ThreeAxisViewer:
                 self.i = i
             return
 
+        # LEFT CLICK in optional multi-planar axes
+        # ax_msag (or f_ax_msag): shows j horizontally and k vertically -> map x->j, y->k
+        if event.inaxes == self._ax_msag and getattr(event, "button", None) == 1:
+            x = event.xdata
+            y = event.ydata
+            if x is None or y is None:
+                return
+            j = int(round(x))
+            k = int(round(y))
+            j = max(0, min(self._n_j - 1, j))
+            k = max(0, min(self._n_k - 1, k))
+            self.j = j
+            self.k = k
+            return
+
+        # ax_mcor (or f_ax_mcor): shows i horizontally and k vertically -> map x->i, y->k
+        if event.inaxes == self._ax_mcor and getattr(event, "button", None) == 1:
+            x = event.xdata
+            y = event.ydata
+            if x is None or y is None:
+                return
+            i = int(round(x))
+            k = int(round(y))
+            i = max(0, min(self._n_i - 1, i))
+            k = max(0, min(self._n_k - 1, k))
+            self.i = i
+            self.k = k
+            return
+
         # RIGHT CLICK (button 3): start dragging to change slices
         if axis is not None and getattr(event, "button", None) == 3:
             self._drag_axis = axis
@@ -569,6 +598,13 @@ class ThreeAxisViewer:
         self._cid_release_k = self._fig_k.canvas.mpl_connect(
             "button_release_event", self.on_button_release
         )
+        # connect key events for mcor and msag too
+        self._cid_release_mcor = self._fig_mcor.canvas.mpl_connect(
+            "button_press_event", self.on_button_press
+        )
+        self._cid_release_msag = self._fig_msag.canvas.mpl_connect(
+            "button_press_event", self.on_button_press
+        )
 
     def disconnect_drag_events(self):
         if hasattr(self, "_cid_press_i") and hasattr(self, "_fig_i"):
@@ -591,6 +627,8 @@ class ThreeAxisViewer:
             self._fig_k.canvas.mpl_disconnect(self._cid_motion_k)
         if hasattr(self, "_cid_release_k") and hasattr(self, "_fig_k"):
             self._fig_k.canvas.mpl_disconnect(self._cid_release_k)
+        # Note: we don't connect drag (motion) events for mcor/msag, so there
+        # is no need to attempt to disconnect related cids here.
 
     def disconnect_scroll_events(self):
         if hasattr(self, "_cid_scroll_i") and hasattr(self, "_fig_i"):
