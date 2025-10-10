@@ -197,7 +197,7 @@ class ThreeAxisViewer:
         # --- control panel: sliders for vmin/vmax and cmap selector ---
         # default display limits
         self._vmin = 0.0
-        self._vmax = 20.0
+        self._vmax = 7.0
         self._cmap = "Greys"
 
         try:
@@ -219,12 +219,13 @@ class ThreeAxisViewer:
             self._ax_ctrl_vmax = self._fig_ctrl.add_axes((0.15, 0.37, 0.7, 0.2))
             self._ax_ctrl_cmap = self._fig_ctrl.add_axes((0.15, 0.07, 0.7, 0.2))
 
-        # sliders
-        self._slider_vmin = mw.Slider(
-            self._ax_ctrl_vmin, "vmin", 0.0, 20.0, valinit=self._vmin
+        # input boxes for vmin/vmax (floating point)
+        # use TextBox widgets so users can type precise values
+        self._textbox_vmin = mw.TextBox(
+            self._ax_ctrl_vmin, "vmin", initial=str(self._vmin)
         )
-        self._slider_vmax = mw.Slider(
-            self._ax_ctrl_vmax, "vmax", 0.0, 20.0, valinit=self._vmax
+        self._textbox_vmax = mw.TextBox(
+            self._ax_ctrl_vmax, "vmax", initial=str(self._vmax)
         )
 
         # cmap selector: prefer Dropdown if available, else fallback to RadioButtons
@@ -245,12 +246,12 @@ class ThreeAxisViewer:
                 self._use_dropdown = False
                 # fallback
                 self._radio_cmap = mw.RadioButtons(
-                    self._ax_ctrl_cmap, ["Greys", "viridis", "plasma", "magma"]
+                    self._ax_ctrl_cmap, ["Greys", "jet", "plasma", "magma"]
                 )
         else:
             self._use_dropdown = False
             self._radio_cmap = mw.RadioButtons(
-                self._ax_ctrl_cmap, ["Greys", "viridis", "plasma", "magma"]
+                self._ax_ctrl_cmap, ["Greys", "jet", "plasma", "magma"]
             )
 
         # apply settings to all images
@@ -278,35 +279,42 @@ class ThreeAxisViewer:
             except Exception:
                 pass
 
-        # slider callbacks
-        def _on_vmin(val):
+        # textbox callbacks
+        def _on_vmin_text(val):
             try:
-                self._vmin = float(val)
+                v = float(val)
             except Exception:
+                # ignore invalid input
                 return
+            # clamp to allowed range
+            v = max(0.0, min(200.0, v))
+            self._vmin = v
             # ensure vmin <= vmax
             if self._vmin > self._vmax:
-                # push vmax up to vmin
+                self._vmax = self._vmin
                 try:
-                    self._slider_vmax.set_val(self._vmin)
+                    self._textbox_vmax.set_val(str(self._vmax))
                 except Exception:
-                    self._vmax = self._vmin
+                    pass
             _apply_clim_and_cmap()
 
-        def _on_vmax(val):
+        def _on_vmax_text(val):
             try:
-                self._vmax = float(val)
+                v = float(val)
             except Exception:
                 return
+            v = max(0.0, min(200.0, v))
+            self._vmax = v
             if self._vmax < self._vmin:
+                self._vmin = self._vmax
                 try:
-                    self._slider_vmin.set_val(self._vmax)
+                    self._textbox_vmin.set_val(str(self._vmin))
                 except Exception:
-                    self._vmin = self._vmax
+                    pass
             _apply_clim_and_cmap()
 
-        self._slider_vmin.on_changed(_on_vmin)
-        self._slider_vmax.on_changed(_on_vmax)
+        self._textbox_vmin.on_submit(_on_vmin_text)
+        self._textbox_vmax.on_submit(_on_vmax_text)
 
         # cmap callbacks
         if getattr(self, "_use_dropdown", False):
