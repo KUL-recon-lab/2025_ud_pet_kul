@@ -133,8 +133,8 @@ if num_epochs > 0:
             optimizer.zero_grad()
 
             batch_losses[batch_idx] = loss.item()
-            batch_psnr[batch_idx] = (
-                psnr(output, targets, data_range=normalized_data_range).mean().item()
+            batch_psnr[batch_idx] = psnr(
+                output, targets, data_range=normalized_data_range
             )
 
             print(
