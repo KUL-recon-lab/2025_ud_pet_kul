@@ -1,6 +1,7 @@
 import numpy as np
 import array_api_compat.torch as xp
 import matplotlib.pyplot as plt
+import matplotlib.widgets as mw
 
 from matplotlib._pylab_helpers import Gcf
 
@@ -192,6 +193,153 @@ class ThreeAxisViewer:
         self.connect_key_events()
         # allow changing slices by dragging the mouse
         self.connect_drag_events()
+
+        # --- control panel: sliders for vmin/vmax and cmap selector ---
+        # default display limits
+        self._vmin = 0.0
+        self._vmax = 20.0
+        self._cmap = "Greys"
+
+        try:
+            # three stacked axes: vmin slider, vmax slider, cmap selector
+            self._fig_ctrl, (
+                self._ax_ctrl_vmin,
+                self._ax_ctrl_vmax,
+                self._ax_ctrl_cmap,
+            ) = plt.subplots(
+                3,
+                1,
+                figsize=(3, 4),
+                layout="constrained",
+            )
+        except Exception:
+            # fallback: create a single figure and add axes manually
+            self._fig_ctrl = plt.figure(figsize=(3, 4), constrained_layout=True)
+            self._ax_ctrl_vmin = self._fig_ctrl.add_axes((0.15, 0.67, 0.7, 0.2))
+            self._ax_ctrl_vmax = self._fig_ctrl.add_axes((0.15, 0.37, 0.7, 0.2))
+            self._ax_ctrl_cmap = self._fig_ctrl.add_axes((0.15, 0.07, 0.7, 0.2))
+
+        # sliders
+        self._slider_vmin = mw.Slider(
+            self._ax_ctrl_vmin, "vmin", 0.0, 20.0, valinit=self._vmin
+        )
+        self._slider_vmax = mw.Slider(
+            self._ax_ctrl_vmax, "vmax", 0.0, 20.0, valinit=self._vmax
+        )
+
+        # cmap selector: prefer Dropdown if available, else fallback to RadioButtons
+        try:
+            Dropdown = getattr(mw, "Dropdown")
+        except Exception:
+            Dropdown = None
+
+        if Dropdown is not None:
+            # use full list of available colormaps
+            cmaps = list(plt.colormaps())
+            try:
+                self._dropdown_cmap = Dropdown(
+                    self._ax_ctrl_cmap, "cmap", cmaps, value=self._cmap
+                )
+                self._use_dropdown = True
+            except Exception:
+                self._use_dropdown = False
+                # fallback
+                self._radio_cmap = mw.RadioButtons(
+                    self._ax_ctrl_cmap, ["Greys", "viridis", "plasma", "magma"]
+                )
+        else:
+            self._use_dropdown = False
+            self._radio_cmap = mw.RadioButtons(
+                self._ax_ctrl_cmap, ["Greys", "viridis", "plasma", "magma"]
+            )
+
+        # apply settings to all images
+        def _apply_clim_and_cmap():
+            imgs = [
+                getattr(self, "_img_i", None),
+                getattr(self, "_img_j", None),
+                getattr(self, "_img_k", None),
+                getattr(self, "_img_mcor", None),
+                getattr(self, "_img_msag", None),
+            ]
+            for im in imgs:
+                if im is None:
+                    continue
+                try:
+                    im.set_clim(self._vmin, self._vmax)
+                except Exception:
+                    pass
+                try:
+                    im.set_cmap(self._cmap)
+                except Exception:
+                    pass
+            try:
+                self.redraw_all()
+            except Exception:
+                pass
+
+        # slider callbacks
+        def _on_vmin(val):
+            try:
+                self._vmin = float(val)
+            except Exception:
+                return
+            # ensure vmin <= vmax
+            if self._vmin > self._vmax:
+                # push vmax up to vmin
+                try:
+                    self._slider_vmax.set_val(self._vmin)
+                except Exception:
+                    self._vmax = self._vmin
+            _apply_clim_and_cmap()
+
+        def _on_vmax(val):
+            try:
+                self._vmax = float(val)
+            except Exception:
+                return
+            if self._vmax < self._vmin:
+                try:
+                    self._slider_vmin.set_val(self._vmax)
+                except Exception:
+                    self._vmin = self._vmax
+            _apply_clim_and_cmap()
+
+        self._slider_vmin.on_changed(_on_vmin)
+        self._slider_vmax.on_changed(_on_vmax)
+
+        # cmap callbacks
+        if getattr(self, "_use_dropdown", False):
+            try:
+
+                def _on_dropdown(label):
+                    # Dropdown.value is the selection in newer mpl; label may be unused
+                    try:
+                        sel = self._dropdown_cmap.value
+                    except Exception:
+                        sel = label
+                    self._cmap = sel
+                    _apply_clim_and_cmap()
+
+                self._dropdown_cmap.on_changed(_on_dropdown)
+            except Exception:
+                # fallback to radio
+                self._radio_cmap.on_clicked(
+                    lambda label: (
+                        setattr(self, "_cmap", label),
+                        _apply_clim_and_cmap(),
+                    )
+                )
+        else:
+            self._radio_cmap.on_clicked(
+                lambda label: (setattr(self, "_cmap", label), _apply_clim_and_cmap())
+            )
+
+        # show control panel
+        try:
+            self._fig_ctrl.show()
+        except Exception:
+            pass
 
         # for fig_i, fig_j, fig_k show a single x and y tick corresponding to the current i, j, k
         self._ax_i.set_xticks([self._j])
@@ -738,6 +886,10 @@ class ThreeAxisViewer:
             for f in figs
             if f in [m.canvas.figure for m in Gcf.get_all_fig_managers()]
         ]
+        # include control panel figure at the end of the row if present
+        if hasattr(self, "_fig_ctrl") and self._fig_ctrl is not None:
+            if self._fig_ctrl in [m.canvas.figure for m in Gcf.get_all_fig_managers()]:
+                figs.append(self._fig_ctrl)
         n = len(figs)
         if n == 0:
             return
