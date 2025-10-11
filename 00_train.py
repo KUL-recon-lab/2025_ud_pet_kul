@@ -194,7 +194,7 @@ if num_epochs > 0:
             )
 
             print(
-                f"Epoch [{epoch:04}/{num_epochs:04}] Batch [{(batch_idx+1):03}/{len(training_patches_loader):03}] - loss: {loss.item():.2E} - NRMSE: {batch_nrmse[batch_idx]:.2f}",
+                f"Epoch [{epoch:04}/{num_epochs:04}] Batch [{(batch_idx+1):03}/{len(training_patches_loader):03}] - loss: {loss.item():.2E} - NRMSE: {batch_nrmse[batch_idx]:.2E}",
                 end="\r",
             )
 
@@ -206,7 +206,7 @@ if num_epochs > 0:
         train_nrmse_avg[epoch - 1] = batch_nrmse.mean().item()
         train_nrmse_std[epoch - 1] = batch_nrmse.std().item()
         print(
-            f"\nEpoch [{epoch:04}/{num_epochs:04}] train loss: {train_loss_avg[epoch-1]:.2E} +- {train_loss_std[epoch-1]:.2E} train NRMSE: {train_nrmse_avg[epoch-1]:.2f} +- {train_nrmse_std[epoch-1]:.2f}"
+            f"\nEpoch [{epoch:04}/{num_epochs:04}] train loss: {train_loss_avg[epoch-1]:.2E} +- {train_loss_std[epoch-1]:.2E} train NRMSE: {train_nrmse_avg[epoch-1]:.4f} +- {train_nrmse_std[epoch-1]:.4f}"
         )
 
         torch.save(
