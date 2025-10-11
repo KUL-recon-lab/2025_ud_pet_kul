@@ -86,8 +86,13 @@ class AddSamplingMap(tio.Transform):
 def get_subject_dict(
     s_dir: Path, crfs: list[str], target_voxel_size: float = 1.65, **kwargs
 ):
-    dcm_file = s_dir / "ref" / "_sample.dcm"
-    suv_fac = get_suv_factor_from_dicom(dcm_file, **kwargs)
+    suv_fac_file = s_dir / "suv_factor.txt"
+    if suv_fac_file.exists():
+        with open(suv_fac_file, "r") as f:
+            suv_fac = float(f.read().strip())
+    else:
+        dcm_file = s_dir / "ref" / "_sample.dcm"
+        suv_fac = get_suv_factor_from_dicom(dcm_file, **kwargs)
 
     subject_dict = {}
     subject_dict["suv_fac"] = suv_fac
