@@ -228,6 +228,7 @@ def val_subject_nrmse(
     count_reduction_factor: int,
     save_path: None | Path = None,
     norm_factor: float = 1.0,
+    **kwargs,
 ):
     transform = tio.Compose([tio.transforms.ToCanonical()])
 
@@ -239,6 +240,7 @@ def val_subject_nrmse(
         subject,
         model_path,
         count_reduction_factor=count_reduction_factor,
+        **kwargs,
     )
 
     metric = nrmse(

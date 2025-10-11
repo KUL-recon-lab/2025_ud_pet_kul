@@ -51,7 +51,7 @@ parser.add_argument(
 )
 # donw_conv in True, False
 parser.add_argument(
-    "--down_conv",
+    "--max_pool",
     action="store_true",
     help="use down convolution instead of max pooling UNET",
 )
@@ -73,7 +73,7 @@ lr = args.lr
 num_epochs = args.num_epochs
 target_voxsize_mm = args.target_voxsize_mm
 
-down_conv = args.down_conv
+down_conv = not args.max_pool
 start_features = args.start_features
 num_levels = args.num_levels
 final_softplus = args.final_softplus
@@ -160,6 +160,8 @@ if num_epochs > 0:
         down_conv=down_conv,
         final_softplus=final_softplus,
     ).to(device)
+    print(model)
+
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = torch.nn.MSELoss()
 
@@ -255,6 +257,9 @@ if num_epochs > 0:
                 count_reduction_factor,
                 norm_factor=normalized_data_range,
                 save_path=output_dir / f"val_sub_{ivb:03}",
+                patch_size=patch_size,
+                patch_overlap=patch_size // 2,
+                batch_size=batch_size,
             )
 
         val_nrmse_avg[epoch - 1] += val_batch_nrmse.mean().item()
