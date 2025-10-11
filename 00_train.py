@@ -1,7 +1,9 @@
+import random
 import argparse
 import json
 import torch
 import torchio as tio
+import numpy as np
 
 from pathlib import Path
 from data import get_subject_dict, psnr
@@ -27,6 +29,19 @@ parser.add_argument(
     default=1.65,
     help="Target voxel size (mm), set to None for no resampling",
 )
+parser.add_argument(
+    "--down_conv",
+    action="store_true",
+    help="use down convolution instead of max pooling UNET",
+)
+# parse features as list of integers
+parser.add_argument(
+    "--features",
+    type=int,
+    nargs="+",
+    default=[16, 32, 64],
+    help="Features in each layer of the UNet",
+)
 
 args = parser.parse_args()
 
@@ -39,13 +54,16 @@ batch_size = args.batch_size
 lr = args.lr
 num_epochs = args.num_epochs
 target_voxsize_mm = args.target_voxsize_mm
+down_conv = args.down_conv
+features = args.features
 
-
-model_kwargs = dict(in_channels=1, out_channels=1)
-
-m_path = Path(
-    "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/nifti_out"
-)
+# seed all random number generators
+seed = 42
+random.seed(seed)
+np.random.seed(seed)
+torch.manual_seed(seed)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed_all(seed)
 
 # %% create an output directory starting with run followed by a date-time stamp
 # dont use tio for date time stamp
@@ -64,16 +82,23 @@ normalized_data_range = 3.5
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-s_dirs = sorted([x for x in m_path.iterdir() if x.is_dir()])[:n_sub]
+# read s_dirs from subjects.txt
+with open("acquisitions.txt", "r") as f:
+    s_dirs = [Path(line.strip()) for line in f.readlines()]
+
+# shuffle s_dirs
+random.shuffle(s_dirs)
+# take first n_sub for training
+training_s_dirs = s_dirs[:n_sub]
 
 subjects_list = [
     tio.Subject(get_subject_dict(s_dir, crfs=[str(count_reduction_factor), "ref"]))
-    for s_dir in s_dirs
+    for s_dir in training_s_dirs
 ]
 
 # save subset_dirs to file output_dir/subset_dirs.json
 with open(output_dir / "training_dirs.json", "w") as f:
-    json.dump([str(s) for s in s_dirs], f, indent=4)
+    json.dump([str(s) for s in training_s_dirs], f, indent=4)
 
 
 # setup preprocessing transforms
@@ -105,7 +130,7 @@ training_patches_loader = tio.SubjectsLoader(
 
 # %%
 if num_epochs > 0:
-    model = UNet3D(**model_kwargs).to(device)
+    model = UNet3D(features=features, down_conv=down_conv).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = torch.nn.MSELoss()
 
@@ -163,9 +188,10 @@ if num_epochs > 0:
             output_dir / f"model_epoch_{epoch:04}.pth",
         )
 
-        with open(output_dir / "train_psnr.txt", "w") as f:
-            for psnr_value in train_psnr_avg[:epoch]:
-                f.write(f"{psnr_value}\n")
+        with open(output_dir / "train_metrics.csv", "a") as f:
+            f.write(
+                f"{epoch}, {loss_avg:.3E}, {loss_std:.3E}, {psnr_avg:.3f}, {psnr_std:.3f}\n"
+            )
 
         # save inputs, ouput, targets tensors to output_dir / last_batch_tensors.pt
         torch.save(

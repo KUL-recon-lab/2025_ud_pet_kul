@@ -69,6 +69,7 @@ class UNet3D(nn.Module):
         in_channels: int = 1,
         out_channels: int = 1,
         features: List[int] = [16, 32, 64],
+        down_conv: bool = True,
     ):
         super().__init__()
 
@@ -77,7 +78,14 @@ class UNet3D(nn.Module):
         prev_ch = in_channels
         for feat in features:
             self.downs.append(DoubleConv(prev_ch, feat))
-            self.pools.append(nn.MaxPool3d(kernel_size=2, stride=2))
+            if down_conv:
+                self.pools.append(
+                    nn.Conv3d(
+                        feat, feat, kernel_size=3, stride=2, padding=1, bias=False
+                    )
+                )
+            else:
+                self.pools.append(nn.MaxPool3d(kernel_size=2, stride=2))
             prev_ch = feat
 
         self.bottleneck = DoubleConv(features[-1], features[-1] * 2)
@@ -88,6 +96,7 @@ class UNet3D(nn.Module):
             self.ups.append(UpSampleConv(feat * 2 + feat, feat))
 
         self.final_conv = nn.Conv3d(features[0], out_channels, kernel_size=1)
+        self.donv_conv = down_conv
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         input_x = x
