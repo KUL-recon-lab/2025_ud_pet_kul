@@ -6,7 +6,7 @@ import torchio as tio
 import numpy as np
 
 from pathlib import Path
-from data import get_subject_dict, psnr
+from data import get_subject_dict, nrmse
 from models import UNet3D
 from datetime import datetime
 
@@ -93,7 +93,8 @@ with open(output_dir / "args.json", "w") as f:
 
 # %%
 num_workers = 10
-normalized_data_range = 3.5
+# norm factor for NRMS computed on log compressed SUV images
+normalized_data_range = 1.0  # exp(1)-1 = 1.71 SUV for uncompressed images
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -155,14 +156,16 @@ if num_epochs > 0:
     criterion = torch.nn.MSELoss()
 
     train_loss_avg = torch.zeros(num_epochs)
-    train_psnr_avg = torch.zeros(num_epochs)
+    train_loss_std = torch.zeros(num_epochs)
+    train_nrmse_avg = torch.zeros(num_epochs)
+    train_nrmse_std = torch.zeros(num_epochs)
 
     for epoch in range(1, num_epochs + 1):
         ############################################################################
         # training loop
         model.train()
         batch_losses = torch.zeros(len(training_patches_loader))
-        batch_psnr = torch.zeros(len(training_patches_loader))
+        batch_nrmse = torch.zeros(len(training_patches_loader))
         for batch_idx, patches_batch in enumerate(training_patches_loader):
             inputs = patches_batch[str(count_reduction_factor)][tio.DATA].to(device)
             targets = patches_batch["ref"][tio.DATA].to(device)
@@ -175,34 +178,34 @@ if num_epochs > 0:
             optimizer.zero_grad()
 
             batch_losses[batch_idx] = loss.item()
-            batch_psnr[batch_idx] = psnr(
+            batch_nrmse[batch_idx] = nrmse(
                 output, targets, data_range=normalized_data_range
             )
 
             print(
-                f"Epoch [{epoch:04}/{num_epochs:04}] Batch [{(batch_idx+1):03}/{len(training_patches_loader):03}] - loss: {loss.item():.2E} - PSNR: {batch_psnr[batch_idx]:.2f}",
+                f"Epoch [{epoch:04}/{num_epochs:04}] Batch [{(batch_idx+1):03}/{len(training_patches_loader):03}] - loss: {loss.item():.2E} - NRMSE: {batch_nrmse[batch_idx]:.2f}",
                 end="\r",
             )
 
         ########################################################################################
         # end of epoch
-        loss_avg = batch_losses.mean().item()
-        train_loss_avg[epoch - 1] = loss_avg
-        loss_std = batch_losses.std().item()
+        train_loss_avg[epoch - 1] = batch_losses.mean().item()
+        train_loss_std[epoch - 1] = batch_losses.std().item()
 
-        psnr_avg = batch_psnr.mean().item()
-        train_psnr_avg[epoch - 1] = psnr_avg
-        psnr_std = batch_psnr.std().item()
+        train_nrmse_avg[epoch - 1] = batch_nrmse.mean().item()
+        train_nrmse_std[epoch - 1] = batch_nrmse.std().item()
         print(
-            f"\nEpoch [{epoch:04}/{num_epochs:04}] train loss: {loss_avg:.2E} +- {loss_std:.2E} train PSNR: {psnr_avg:.2f} +- {psnr_std:.2f}"
+            f"\nEpoch [{epoch:04}/{num_epochs:04}] train loss: {train_loss_avg[epoch-1]:.2E} +- {train_loss_std[epoch-1]:.2E} train NRMSE: {train_nrmse_avg[epoch-1]:.2f} +- {train_nrmse_std[epoch-1]:.2f}"
         )
 
         torch.save(
             {
                 "model_state_dict": model.state_dict(),
                 "optimizer_state_dict": optimizer.state_dict(),
-                "train_loss": train_loss_avg[epoch - 1],
-                "train_psnr": train_psnr_avg[epoch - 1],
+                "train_loss_avg": train_loss_avg[epoch - 1],
+                "train_nrmse_avg": train_nrmse_avg[epoch - 1],
+                "train_loss_std": train_loss_std[epoch - 1],
+                "train_nrmse_std": train_nrmse_std[epoch - 1],
                 "epoch": epoch,
             },
             output_dir / f"model_epoch_{epoch:04}.pth",
@@ -210,7 +213,7 @@ if num_epochs > 0:
 
         with open(output_dir / "train_metrics.csv", "a") as f:
             f.write(
-                f"{epoch}, {loss_avg:.3E}, {loss_std:.3E}, {psnr_avg:.3f}, {psnr_std:.3f}\n"
+                f"{epoch}, {train_loss_avg[epoch-1]:.3E}, {train_loss_std[epoch-1]:.3E}, {train_nrmse_avg[epoch-1]:.3f}, {train_nrmse_std[epoch-1]:.3f}\n"
             )
 
         # save inputs, ouput, targets tensors to output_dir / last_batch_tensors.pt

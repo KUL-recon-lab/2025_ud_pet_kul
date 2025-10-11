@@ -167,3 +167,17 @@ def psnr(output, targets, data_range: float):
 
     # return mean PSNR across valid samples as float
     return psnr_per_sample.mean().item()
+
+
+def nrmse(output, targets, data_range: float):
+    # compute psnr per sample in batch
+    # pnsr of torchmetrics has memory leak
+    mse_per_elem = F.mse_loss(output, targets, reduction="none")
+    # spatial/channel dims to reduce to per-sample values
+    dims = tuple(range(1, mse_per_elem.ndim))
+
+    # per-sample MSE
+    mse_per_sample = mse_per_elem.mean(dim=dims)
+    nrmse_per_sample = torch.sqrt(mse_per_sample) / data_range
+
+    return nrmse_per_sample.mean().item()
