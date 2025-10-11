@@ -6,7 +6,7 @@ import torchio as tio
 import numpy as np
 
 from pathlib import Path
-from data import get_subject_dict, nrmse
+from data import get_subject_dict, nrmse, val_subject_nrmse
 from models import UNet3D
 from datetime import datetime
 
@@ -19,7 +19,12 @@ parser.add_argument("--queue_length", type=int, default=1000, help="Queue length
 parser.add_argument(
     "--samples_per_volume", type=int, default=100, help="Samples per volume"
 )
-parser.add_argument("--n_sub", type=int, default=100, help="Number of subjects")
+parser.add_argument(
+    "--num_sub_train", type=int, default=100, help="Number of subjects for training"
+)
+parser.add_argument(
+    "--num_sub_val", type=int, default=10, help="Number of subjects for validation"
+)
 parser.add_argument("--batch_size", type=int, default=20, help="Batch size")
 parser.add_argument("--num_epochs", type=int, default=20, help="Number of epochs")
 parser.add_argument(
@@ -61,7 +66,8 @@ count_reduction_factor = args.count_reduction_factor
 patch_size = args.patch_size
 queue_length = args.queue_length
 samples_per_volume = args.samples_per_volume
-n_sub = args.n_sub
+num_sub_train = args.num_sub_train
+num_sub_val = args.num_sub_val
 batch_size = args.batch_size
 lr = args.lr
 num_epochs = args.num_epochs
@@ -104,8 +110,10 @@ with open("acquisitions.txt", "r") as f:
 
 # shuffle s_dirs
 random.shuffle(s_dirs)
-# take first n_sub for training
-training_s_dirs = s_dirs[:n_sub]
+# take first num_sub_train for training
+training_s_dirs = s_dirs[:num_sub_train]
+# take next num_sub_val for validation
+validation_s_dirs = s_dirs[num_sub_train : (num_sub_train + num_sub_val)]
 
 subjects_list = [
     tio.Subject(get_subject_dict(s_dir, crfs=[str(count_reduction_factor), "ref"]))
@@ -160,6 +168,9 @@ if num_epochs > 0:
     train_nrmse_avg = torch.zeros(num_epochs)
     train_nrmse_std = torch.zeros(num_epochs)
 
+    val_nrmse_avg = torch.zeros(num_epochs)
+    val_nrmse_std = torch.zeros(num_epochs)
+
     for epoch in range(1, num_epochs + 1):
         ############################################################################
         # training loop
@@ -211,11 +222,6 @@ if num_epochs > 0:
             output_dir / f"model_epoch_{epoch:04}.pth",
         )
 
-        with open(output_dir / "train_metrics.csv", "a") as f:
-            f.write(
-                f"{epoch}, {train_loss_avg[epoch-1]:.3E}, {train_loss_std[epoch-1]:.3E}, {train_nrmse_avg[epoch-1]:.3f}, {train_nrmse_std[epoch-1]:.3f}\n"
-            )
-
         # save inputs, ouput, targets tensors to output_dir / last_batch_tensors.pt
         torch.save(
             {
@@ -235,3 +241,31 @@ if num_epochs > 0:
             scripted_model.save(output_dir / f"model_{epoch:04}_scripted.pt")
         except Exception as e:
             print(f"Could not export model to TorchScript: {e}")
+
+        ############################################################################
+        # validation loop
+        val_batch_nrmse = torch.zeros(len(validation_s_dirs))
+        for ivb, s_dir in enumerate(validation_s_dirs):
+            print(
+                f"Validating subject {ivb+1:03}/{len(validation_s_dirs):03}", end="\r"
+            )
+            val_batch_nrmse[ivb] = val_subject_nrmse(
+                s_dir,
+                output_dir / f"model_{epoch:04}_scripted.pt",
+                count_reduction_factor,
+                norm_factor=normalized_data_range,
+                save_path=output_dir / f"val_sub_{ivb:03}",
+            )
+
+        val_nrmse_avg[epoch - 1] += val_batch_nrmse.mean().item()
+        val_nrmse_std[epoch - 1] += val_batch_nrmse.std().item()
+
+        print(
+            f"\nEpoch [{epoch:04}/{num_epochs:04}] val NRMSE: {val_nrmse_avg[epoch-1]:.4f} +- {val_nrmse_std[epoch-1]:.4f}"
+        )
+
+        #########################################################################
+        with open(output_dir / "train_metrics.csv", "a") as f:
+            f.write(
+                f"{epoch}, {train_loss_avg[epoch-1]:.3E}, {train_loss_std[epoch-1]:.3E}, {train_nrmse_avg[epoch-1]:.4f}, {train_nrmse_std[epoch-1]:.4f}, {val_nrmse_avg[epoch-1]:.4f}, {val_nrmse_std[epoch-1]:.4f}\n"
+            )
