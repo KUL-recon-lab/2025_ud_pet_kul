@@ -101,7 +101,7 @@ def get_subject_dict(
         subject_dict[f"{d}"] = tio.ScalarImage(dfile)
 
     subject_dict["sampling_map"] = tio.ScalarImage(
-        s_dir / f"sampling_map_{target_voxel_size:.2f}.nii.gz"
+        s_dir / f"new_sampling_map_{target_voxel_size:.2f}.nii.gz"
     )
 
     return subject_dict
