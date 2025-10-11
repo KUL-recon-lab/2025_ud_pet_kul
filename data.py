@@ -4,6 +4,7 @@ import pydicom
 import torch
 import torch.nn.functional as F
 import torchio as tio
+import nibabel as nib
 
 from pathlib import Path
 from time import strptime
@@ -181,3 +182,89 @@ def nrmse(output, targets, data_range: float):
     nrmse_per_sample = torch.sqrt(mse_per_sample) / data_range
 
     return nrmse_per_sample.mean().item()
+
+
+def patch_inference(
+    subject: tio.Subject,
+    scripted_model_path: Path,
+    count_reduction_factor=10,
+    patch_size=64,
+    patch_overlap=32,
+    batch_size=20,
+):
+
+    grid_sampler = tio.inference.GridSampler(
+        subject,
+        patch_size,
+        patch_overlap,
+    )
+
+    patch_loader = tio.SubjectsLoader(grid_sampler, batch_size=batch_size)
+    aggregator = tio.inference.GridAggregator(grid_sampler)
+
+    # load the model from torch script
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model = torch.jit.load(scripted_model_path, map_location=device)
+
+    model.eval()
+    with torch.no_grad():
+        for patches_batch in patch_loader:
+            input_tensor = patches_batch[f"{count_reduction_factor}"][tio.DATA].to(
+                device
+            )
+            locations = patches_batch[tio.LOCATION].to(device)
+            outputs = model(input_tensor)
+            aggregator.add_batch(outputs, locations)
+
+    return aggregator.get_output_tensor()
+
+
+# %%
+
+
+def val_subject_nrmse(
+    s_dir: Path,
+    model_path: Path,
+    count_reduction_factor: int,
+    save_path: None | Path = None,
+    norm_factor: float = 1.0,
+):
+    transform = tio.Compose([tio.transforms.ToCanonical()])
+
+    subject = transform(
+        tio.Subject(get_subject_dict(s_dir, crfs=[str(count_reduction_factor), "ref"]))
+    )
+
+    output_tensor = patch_inference(
+        subject,
+        model_path,
+        count_reduction_factor=count_reduction_factor,
+    )
+
+    metric = nrmse(
+        output_tensor.unsqueeze(0),
+        subject["ref"].data.unsqueeze(0).to(output_tensor.device),
+        norm_factor,
+    )
+
+    # dump arrays to numpy files (for quick loading / viewing)
+    if save_path is not None:
+        if not save_path.exists():
+            save_path.mkdir(parents=True, exist_ok=True)
+        affine = subject["ref"].affine
+        nib.save(
+            nib.Nifti1Image(
+                subject[f"{count_reduction_factor}"].data.numpy().squeeze(), affine
+            ),
+            save_path / "input.nii.gz",
+        )
+        nib.save(
+            nib.Nifti1Image(output_tensor.cpu().numpy().squeeze(), affine),
+            save_path / "out.nii.gz",
+        )
+        nib.save(
+            nib.Nifti1Image(subject["ref"].data.numpy().squeeze(), affine),
+            save_path / "ref.nii.gz",
+        )
+
+    return metric
