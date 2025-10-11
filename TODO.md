@@ -1,3 +1,6 @@
+- simple sweep parameters
+- correct sampling maps
+
 WHAT TO LOOK FOR:
 - abnormal lesions (many)
 - very unsusal uptake patterns (intestine, bone marrow, ...)

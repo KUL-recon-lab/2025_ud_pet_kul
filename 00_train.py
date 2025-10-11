@@ -21,7 +21,6 @@ parser.add_argument(
 )
 parser.add_argument("--n_sub", type=int, default=100, help="Number of subjects")
 parser.add_argument("--batch_size", type=int, default=20, help="Batch size")
-parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
 parser.add_argument("--num_epochs", type=int, default=20, help="Number of epochs")
 parser.add_argument(
     "--target_voxsize_mm",
@@ -29,18 +28,31 @@ parser.add_argument(
     default=1.65,
     help="Target voxel size (mm), set to None for no resampling",
 )
+
+# sweep parameters
+# lr in 1e-3, 3e-4
+parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
+
+# start_features in 16, 32
+parser.add_argument(
+    "--start_features",
+    type=int,
+    default=16,
+    help="Features in first level of the UNet",
+)
+# num_levels in 3, 4
+parser.add_argument(
+    "--num_levels", type=int, default=3, help="Number of levels in UNet"
+)
+# donw_conv in True, False
 parser.add_argument(
     "--down_conv",
     action="store_true",
     help="use down convolution instead of max pooling UNET",
 )
-# parse features as list of integers
+# final_softplus in False, True
 parser.add_argument(
-    "--features",
-    type=int,
-    nargs="+",
-    default=[16, 32, 64],
-    help="Features in each layer of the UNet",
+    "--final_softplus", action="store_true", help="Use final Softplus instead of ReLU"
 )
 
 args = parser.parse_args()
@@ -54,8 +66,11 @@ batch_size = args.batch_size
 lr = args.lr
 num_epochs = args.num_epochs
 target_voxsize_mm = args.target_voxsize_mm
+
 down_conv = args.down_conv
-features = args.features
+start_features = args.start_features
+num_levels = args.num_levels
+final_softplus = args.final_softplus
 
 # seed all random number generators
 seed = 42
@@ -130,7 +145,12 @@ training_patches_loader = tio.SubjectsLoader(
 
 # %%
 if num_epochs > 0:
-    model = UNet3D(features=features, down_conv=down_conv).to(device)
+    model = UNet3D(
+        start_features=start_features,
+        num_levels=num_levels,
+        down_conv=down_conv,
+        final_softplus=final_softplus,
+    ).to(device)
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
     criterion = torch.nn.MSELoss()
 
