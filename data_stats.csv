@@ -1,4 +1,4 @@
-acq, weight, height, bmi, tracer, scanner, activity, scantime_pi, recon, noise_metric
+acq,weight,height,bmi,tracer,scanner,activity,scantime_pi,recon,noise_metric
 Anonymous_ANO_20230201_1627052_093335,74.0,1.75,24.2,FDG,uEXPLORER,283.79,56.38,100,0.18760947
 Anonymous_ANO_20230201_1627052_093335,74.0,1.75,24.2,FDG,uEXPLORER,283.79,56.38,50,0.13098788
 Anonymous_ANO_20230201_1627052_093335,74.0,1.75,24.2,FDG,uEXPLORER,283.79,56.38,20,0.08885407
