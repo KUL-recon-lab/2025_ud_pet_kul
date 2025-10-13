@@ -1,6 +1,7 @@
 import nibabel as nib
 import numpy as np
 import random
+import argparse
 import matplotlib.pyplot as plt
 from pathlib import Path
 import pydicom
@@ -16,12 +17,29 @@ def noise_metric(vol):
 
 random.seed(42)
 
+# parse optional chunk argument to run in data-parallel chunks
+parser = argparse.ArgumentParser(description="Compute noise metrics over subject dirs")
+parser.add_argument(
+    "ichunk", type=int, help="which chunk index to process", choices=range(6)
+)
+
+args = parser.parse_args()
+ichunk = args.ichunk
+nchunks = 6
+
+# %%
+
+# validate ichunk
+if ichunk is not None:
+    if ichunk < 0 or ichunk >= nchunks:
+        raise SystemExit(f"--ichunk must be in [0,{nchunks-1}] but got {ichunk}")
+
 # get the user name that is running the script
 mdir = (
     "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/nifti_out"
 )
 
-outfile = Path(".") / f"data_stats.csv"
+outfile = Path(".") / f"data_stats_{ichunk}.csv"
 if not outfile.exists():
     outfile.touch()
 
@@ -30,8 +48,15 @@ s_dirs = sorted([d for d in Path(mdir).iterdir() if d.is_dir()])
 # shuffle s_dirs
 random.shuffle(s_dirs)
 
+# if running in chunked mode, select only the subset for this chunk
+old_n = len(s_dirs)
+s_dirs = s_dirs[ichunk::nchunks]
+print(
+    f"Running chunk {ichunk}/{nchunks}: processing {len(s_dirs)} of {old_n} subject dirs"
+)
+
 for i, s_dir in enumerate(s_dirs):
-    print(f"{i:03d}: {s_dir.name}")
+    print(f"{i:03d}/{len(s_dirs)}: {s_dir.name}")
     dcm = pydicom.dcmread(s_dir / "ref" / "_sample.dcm")
     # get patient weight and height from dicom if exists
     if "PatientWeight" in dcm:
