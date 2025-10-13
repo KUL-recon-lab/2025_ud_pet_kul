@@ -61,7 +61,10 @@ for i, s_dir in enumerate(s_dirs):
         print(f"{i:03d}: {s_dir.name}")
 
         img = Image.open(mip_file)
-        img.show()
+
+        fig, ax = plt.subplots(figsize=(14, 10))
+        ax.imshow(img)
+        fig.show()
 
         # have the user input a category using a number from 0, 1, 3, ...
         cat = -1
@@ -75,6 +78,8 @@ for i, s_dir in enumerate(s_dirs):
                 cat = int(input_str)
             except:
                 cat = -1
+
+        # plt.close(fig)
 
         if cat == -2:
             print("Exiting...")
