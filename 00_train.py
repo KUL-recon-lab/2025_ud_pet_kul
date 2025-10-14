@@ -7,6 +7,7 @@ import numpy as np
 
 from pathlib import Path
 from data import get_subject_dict, nrmse, val_subject_nrmse
+from losses import RobustL1Loss
 from models import UNet3D
 from datetime import datetime
 
@@ -33,7 +34,16 @@ parser.add_argument(
     default=16,
     help="Features in first level of the UNet",
 )
-# num_levels in 3, 4
+# sweep loss in MSE, RobustL1
+parser.add_argument(
+    "--loss",
+    type=str,
+    default="MSE",
+    choices=["MSE", "RobustL1"],
+    help="Loss function to use",
+)
+
+# num_levels keep 3
 parser.add_argument(
     "--num_levels", type=int, default=3, help="Number of levels in UNet"
 )
@@ -69,6 +79,8 @@ parser.add_argument(
 parser.add_argument(
     "--final_softplus", action="store_true", help="Use final Softplus instead of ReLU"
 )
+
+
 args = parser.parse_args()
 
 # -------------------------------------------------------------------------------
@@ -79,6 +91,7 @@ queue_length = args.queue_length
 samples_per_volume = args.samples_per_volume
 batch_size = args.batch_size
 lr = args.lr
+args.loss = args.loss
 num_epochs = args.num_epochs
 
 down_conv = not args.max_pool
@@ -161,6 +174,7 @@ training_patches_queue = tio.Queue(
     samples_per_volume,
     training_sampler,
     num_workers=num_workers,
+    start_background=True,
     verbose=True,
 )
 
@@ -182,7 +196,13 @@ if num_epochs > 0:
     print(model)
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
-    criterion = torch.nn.MSELoss()
+
+    if args.loss == "MSE":
+        criterion = torch.nn.MSELoss()
+    elif args.loss == "RobustL1":
+        criterion = RobustL1Loss(eps=1e-2)
+    else:
+        raise ValueError(f"Unknown loss function: {args.loss}")
 
     train_loss_avg = torch.zeros(num_epochs)
     train_loss_std = torch.zeros(num_epochs)
