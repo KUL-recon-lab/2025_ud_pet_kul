@@ -19,5 +19,5 @@ for i, s_dir in enumerate(s_dirs):
     new_s_dir_path = new_mdir / s_dir
     print(f"{(i+1):03d}/{len(s_dirs)}: {s_dir}, {new_s_dir_path}")
 
-    # if not new_s_dir_path.exists():
-    #     shutil.copytree(s_dir_path, new_s_dir_path, dirs_exist_ok=True)
+    if not new_s_dir_path.exists():
+        shutil.copytree(s_dir_path, new_s_dir_path, dirs_exist_ok=True)

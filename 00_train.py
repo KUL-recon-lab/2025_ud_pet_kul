@@ -52,7 +52,7 @@ parser.add_argument(
 parser.add_argument(
     "--mdir",
     type=str,
-    default="/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/nifti_out",
+    default="/tmp/2025_ud_pet_challenge/nifti_out",
     help="Main directory containing subject subdirectories",
 )
 # add arguments for train and val subject files
@@ -141,11 +141,21 @@ if len(mutual) > 0:
     raise ValueError(f"Mutual subjects in training and validation: {mutual}")
 
 # shuffle s_dirs - the are stored in order of the categories
+
+# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+training_s_dirs = training_s_dirs[:2]
+validation_s_dirs = validation_s_dirs[:2]
+# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+
 random.shuffle(training_s_dirs)
 random.shuffle(validation_s_dirs)
 
 subjects_list = [
-    tio.Subject(get_subject_dict(s_dir, crfs=[str(count_reduction_factor), "ref"]))
+    tio.Subject(
+        get_subject_dict(s_dir, input_str=str(count_reduction_factor), ref_str="ref")
+    )
     for s_dir in training_s_dirs
 ]
 
@@ -219,7 +229,7 @@ if num_epochs > 0:
         batch_losses = torch.zeros(len(training_patches_loader))
         batch_nrmse = torch.zeros(len(training_patches_loader))
         for batch_idx, patches_batch in enumerate(training_patches_loader):
-            inputs = patches_batch[str(count_reduction_factor)][tio.DATA].to(device)
+            inputs = patches_batch["input"][tio.DATA].to(device)
             targets = patches_batch["ref"][tio.DATA].to(device)
 
             output = model(inputs)

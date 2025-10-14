@@ -5,7 +5,7 @@ import torch
 import torch.nn.functional as F
 import torchio as tio
 import nibabel as nib
-import numpy as bp
+import numpy as np
 
 from pathlib import Path
 from time import strptime
@@ -88,7 +88,12 @@ class AddSamplingMap(tio.Transform):
 
 
 def get_subject_dict(
-    s_dir: Path, crfs: list[str], target_voxel_size: float = 1.65, crop=False, **kwargs
+    s_dir: Path,
+    input_str: str,
+    ref_str: str | None = "ref",
+    target_voxel_size: float = 1.65,
+    crop=False,
+    **kwargs,
 ):
     suv_fac_file = s_dir / "suv_factor.txt"
     if suv_fac_file.exists():
@@ -100,17 +105,26 @@ def get_subject_dict(
 
     subject_dict = {}
     subject_dict["suv_fac"] = suv_fac
-    subject_dict["crfs"] = crfs
+    subject_dict["input_str"] = input_str
     subject_dict["s_dir"] = s_dir
 
-    for d in crfs:
-        if crop:
-            dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}_cropped.nii.gz"
-        else:
-            dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}.nii.gz"
-        # dfile = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))[0]
-        subject_dict[f"{d}_file"] = dfile
-        subject_dict[f"{d}"] = tio.ScalarImage(dfile)
+    if crop:
+        crop_suffix = "_cropped"
+    else:
+        crop_suffix = ""
+
+    # load the input
+    dfile = s_dir / input_str / f"resampled_{target_voxel_size:.2f}{crop_suffix}.nii.gz"
+    subject_dict["input_file"] = dfile
+    subject_dict["input"] = tio.ScalarImage(dfile)
+
+    # load the reference if specified
+    if ref_str is not None:
+        ref_file = (
+            s_dir / ref_str / f"resampled_{target_voxel_size:.2f}{crop_suffix}.nii.gz"
+        )
+        subject_dict["ref_file"] = ref_file
+        subject_dict["ref"] = tio.ScalarImage(ref_file)
 
     if not crop:
         subject_dict["sampling_map"] = tio.ScalarImage(
@@ -135,7 +149,6 @@ def nrmse(output, targets, data_range: float):
 def patch_inference(
     subject: tio.Subject,
     scripted_model_path: Path,
-    count_reduction_factor=10,
     patch_size=96,
     patch_overlap=48,
     batch_size=20,
@@ -163,11 +176,7 @@ def patch_inference(
                     f"Processing patch batch {(i+1):04}/{len(patch_loader):04}",
                     end="\r",
                 )
-            input_tensor = (
-                patches_batch[f"{count_reduction_factor}"][tio.DATA]
-                .to(torch.float32)
-                .to(device)
-            )
+            input_tensor = patches_batch["input"][tio.DATA].to(torch.float32).to(device)
             locations = patches_batch[tio.LOCATION].to(device)
             outputs = model(input_tensor)
             aggregator.add_batch(outputs, locations)
@@ -199,7 +208,7 @@ def val_subject_nrmse(
     subject = transform(
         tio.Subject(
             get_subject_dict(
-                s_dir, crfs=[str(count_reduction_factor), "ref"], crop=crop
+                s_dir, input_str=str(count_reduction_factor), ref_str="ref", crop=crop
             )
         )
     )
@@ -210,7 +219,6 @@ def val_subject_nrmse(
     output_tensor = patch_inference(
         subject,
         model_path,
-        count_reduction_factor=count_reduction_factor,
         verbose=verbose,
         **kwargs,
     )
@@ -232,20 +240,10 @@ def val_subject_nrmse(
         if not save_path.exists():
             save_path.mkdir(parents=True, exist_ok=True)
         affine = subject["ref"].affine
-        # nib.save(
-        #    nib.Nifti1Image(
-        #        subject[f"{count_reduction_factor}"].data.numpy().squeeze(), affine
-        #    ),
-        #    save_path / "input.nii",
-        # )
         nib.save(
             nib.Nifti1Image(output_tensor.cpu().numpy().squeeze(), affine),
             save_path / "out.nii",
         )
-        # nib.save(
-        #    nib.Nifti1Image(subject["ref"].data.numpy().squeeze(), affine),
-        #    save_path / "ref.nii",
-        # )
 
     if verbose:
         print(f"finished")

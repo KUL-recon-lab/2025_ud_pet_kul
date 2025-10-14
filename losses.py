@@ -1,7 +1,7 @@
 import torch
 
 
-class RobustL1Loss(nn.Module):
+class RobustL1Loss(torch.nn.Module):
     """
     Robust L1 / Charbonnier loss: sqrt((x - y)^2 + eps^2)
 

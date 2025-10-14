@@ -7,9 +7,11 @@ mdir = Path(
     "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/nifti_out"
 )
 
-with open("val.txt", "r") as f:
-    s_dirs = [mdir / Path(line.strip()) for line in f.readlines()]
-s_dir = s_dirs[0]
+# with open("val.txt", "r") as f:
+#    s_dirs = [mdir / Path(line.strip()) for line in f.readlines()]
+# s_dir = s_dirs[0]
+
+s_dir = mdir / "Anonymous_ANO_20220224_1843069_103247"
 
 met = val_subject_nrmse(
     s_dir,
