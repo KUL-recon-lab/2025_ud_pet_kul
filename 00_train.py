@@ -12,8 +12,13 @@ from models import UNet3D
 from datetime import datetime
 
 parser = argparse.ArgumentParser(description="Train 3D UNet on PET data")
+# we need to run trainings for all 3 valid settings
 parser.add_argument(
-    "--count_reduction_factor", type=int, default=10, help="Count reduction factor"
+    "--crf_setting",
+    type=str,
+    default="10-20",
+    help="Count reduction factor",
+    choices=["10-20", "50-100", "4"],
 )
 parser.add_argument("--patch_size", type=int, default=96, help="Patch size")
 parser.add_argument("--queue_length", type=int, default=1000, help="Queue length")
@@ -25,7 +30,7 @@ parser.add_argument("--num_epochs", type=int, default=20, help="Number of epochs
 
 # sweep parameters
 # lr in 1e-3, 3e-4
-parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
+parser.add_argument("--lr", type=float, default=4e-3, help="Learning rate")
 
 # start_features in 16, 32
 parser.add_argument(
@@ -85,7 +90,7 @@ args = parser.parse_args()
 
 # -------------------------------------------------------------------------------
 
-count_reduction_factor = args.count_reduction_factor
+crf_setting = args.crf_setting
 patch_size = args.patch_size
 queue_length = args.queue_length
 samples_per_volume = args.samples_per_volume
@@ -102,6 +107,15 @@ final_softplus = args.final_softplus
 mdir = Path(args.mdir)
 train_sub_file = Path(args.train_sub_file)
 val_sub_file = Path(args.val_sub_file)
+
+if crf_setting == "10-20":
+    count_reduction_factors = [10, 20]
+elif crf_setting == "50-100":
+    count_reduction_factors = [50, 100]
+elif crf_setting == "4":
+    count_reduction_factors = [4]
+else:
+    raise ValueError(f"Unknown crf_setting: {crf_setting}")
 
 # seed all random number generators
 seed = 42
@@ -142,22 +156,23 @@ if len(mutual) > 0:
 
 # shuffle s_dirs - the are stored in order of the categories
 
-# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-training_s_dirs = training_s_dirs[:2]
-validation_s_dirs = validation_s_dirs[:2]
-# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-# XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-
 random.shuffle(training_s_dirs)
 random.shuffle(validation_s_dirs)
 
-subjects_list = [
-    tio.Subject(
-        get_subject_dict(s_dir, input_str=str(count_reduction_factor), ref_str="ref")
+subjects_list = []
+for i, s_dir in enumerate(training_s_dirs):
+    if (i % 2 == 0) or (len(count_reduction_factors) == 1):
+        count_reduction_factor = count_reduction_factors[0]
+    else:
+        count_reduction_factor = count_reduction_factors[1]
+
+    subjects_list.append(
+        tio.Subject(
+            get_subject_dict(
+                s_dir, input_str=str(count_reduction_factor), ref_str="ref"
+            )
+        )
     )
-    for s_dir in training_s_dirs
-]
 
 # save subset_dirs to file output_dir/subset_dirs.json
 with open(output_dir / "training_dirs.json", "w") as f:
@@ -229,8 +244,8 @@ if num_epochs > 0:
         batch_losses = torch.zeros(len(training_patches_loader))
         batch_nrmse = torch.zeros(len(training_patches_loader))
         for batch_idx, patches_batch in enumerate(training_patches_loader):
-            inputs = patches_batch["input"][tio.DATA].to(device)
-            targets = patches_batch["ref"][tio.DATA].to(device)
+            inputs = patches_batch["input"][tio.DATA].to(torch.float32).to(device)
+            targets = patches_batch["ref"][tio.DATA].to(torch.float32).to(device)
 
             output = model(inputs)
 
@@ -300,6 +315,12 @@ if num_epochs > 0:
             print(
                 f"Validating subject {ivb+1:03}/{len(validation_s_dirs):03}", end="\r"
             )
+
+            if ivb % 2 == 0 or (len(count_reduction_factors) == 1):
+                count_reduction_factor = count_reduction_factors[0]
+            else:
+                count_reduction_factor = count_reduction_factors[1]
+
             val_batch_nrmse[ivb] = val_subject_nrmse(
                 s_dir,
                 output_dir / f"model_{epoch:04}_scripted.pt",
