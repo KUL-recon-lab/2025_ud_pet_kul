@@ -1,0 +1,37 @@
+#getting started
+1. opdracht prompt openen
+2. conda activate screen-charles
+3. python screen_mips.py
+
+
+#artefacts
+Anonymous_ANO_20220704_1432027_104818
+Anonymous_ANO_20230201_1721183_105124
+130622_4_20220613_133323 -- very SUVs; weight wrong
+Anonymous_ANO_20230304_2006087_121244 wrong weight
+ 120922_1_20220912_165937: invaded ureter?
+ Anonymous_ANO_20220223_1836013_164626 knee, foot
+Anonymous_ANO_20230201_1506299_112450 bone marrow invasion
+Anonymous_ANO_20230608_1524039_125233 clicked too fast, maybe solid tumor
+ 12112021_2_20211115_081415: only legs
+Anonymous_ANO_20230409_1848553_090344: urine sack
+20221025_1_20221025_170832 paravenous injection
+ Anonymous_ANO_20230421_1720597_090351: brain? MIP not ideal for evaluating brain lesions, probably nothing
+Anonymous_ANO_20230505_1815224_130733: arm movement, injection site visible
+Anonymous_ANO_20220225_1927450_103935 quid bladder
+Anonymous_ANO_20230326_1608052_092950: liver cirrosis? metastases?
+Anonymous_ANO_20230221_1714442_112230 too fast, maybe low contrast bladder?
+Anonymous_ANO_20230402_1100528_132413: solid + bone marrow
+ Anonymous_ANO_20220220_0001544_104008 thyroiditis?
+Anonymous_ANO_20220219_1730488_173342 small low contrast lesions
+070722_1_20220707_162729 suprapubi sonde
+Anonymous_ANO_20220601_1715523_112053 pleural invasion?
+ 28042022_2_20220428_181445: one kidney
+ Anonymous_ANO_20220223_1753176_134618 spleen
+Anonymous_ANO_20230519_1808448_132917 paravenous
+20221025_2_20221025_170856 spleen?
+
+# extra intesting cases
+Anonymous_ANO_20230531_1953215_094109
+
+note: would be could to have the option to load axial slices as well
