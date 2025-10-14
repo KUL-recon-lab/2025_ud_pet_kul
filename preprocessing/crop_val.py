@@ -1,4 +1,5 @@
 import nibabel as nib
+import numpy as np
 from pathlib import Path
 from scipy.ndimage import find_objects
 
@@ -13,7 +14,7 @@ for s_dir in validation_s_dirs:
     print(s_dir.name)
 
     ref_nii = nib.load(s_dir / "ref" / "resampled_1.65.nii.gz")
-    ref_vol = ref_nii.get_fdata()
+    ref_vol = ref_nii.get_fdata().astype(np.float32)
 
     # find the bounding box
     bbox = find_objects((ref_vol > 0.1).astype(int))[0]
@@ -23,16 +24,15 @@ for s_dir in validation_s_dirs:
     start = [bbox[i].start for i in range(3)]
     new_affine = ref_nii.affine.copy()
     new_affine[:3, 3] += ref_nii.affine[:3, :3] @ start
+    new_affine = new_affine.astype(np.float32)
 
-    ofile = s_dir / "ref" / "resampled_1.65_cropped.nii"
-    if not ofile.exists():
-        nib.save(nib.Nifti1Image(ref_vol[bbox], new_affine), ofile)
+    orfile = s_dir / "ref" / "resampled_1.65_cropped.nii"
+    nib.save(nib.Nifti1Image(ref_vol[bbox], new_affine), orfile)
 
     for d in ["100", "50", "20", "10", "4"]:
         print(d)
-        ofile = s_dir / d / "resampled_1.65_cropped.nii"
-        if not ofile.exists():
-            dfile = s_dir / d / "resampled_1.65.nii.gz"
-            nii = nib.load(dfile)
-            vol = nii.get_fdata()
-            nib.save(nib.Nifti1Image(vol[bbox], new_affine), ofile)
+        odfile = s_dir / d / "resampled_1.65_cropped.nii"
+        dfile = s_dir / d / "resampled_1.65.nii.gz"
+        nii = nib.load(dfile)
+        vol = nii.get_fdata().astype(np.float32)
+        nib.save(nib.Nifti1Image(vol[bbox], new_affine), odfile)

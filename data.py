@@ -88,7 +88,7 @@ class AddSamplingMap(tio.Transform):
 
 
 def get_subject_dict(
-    s_dir: Path, crfs: list[str], target_voxel_size: float = 1.65, **kwargs
+    s_dir: Path, crfs: list[str], target_voxel_size: float = 1.65, crop=False, **kwargs
 ):
     suv_fac_file = s_dir / "suv_factor.txt"
     if suv_fac_file.exists():
@@ -104,78 +104,23 @@ def get_subject_dict(
     subject_dict["s_dir"] = s_dir
 
     for d in crfs:
-        dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}.nii.gz"
+        if crop:
+            dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}_cropped.nii"
+        else:
+            dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}.nii.gz"
         # dfile = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))[0]
         subject_dict[f"{d}_file"] = dfile
         subject_dict[f"{d}"] = tio.ScalarImage(dfile)
 
-    subject_dict["sampling_map"] = tio.ScalarImage(
-        s_dir / f"new_sampling_map_{target_voxel_size:.2f}.nii.gz"
-    )
+    if not crop:
+        subject_dict["sampling_map"] = tio.ScalarImage(
+            s_dir / f"new_sampling_map_{target_voxel_size:.2f}.nii.gz"
+        )
 
     return subject_dict
-
-
-def get_subject_dict_old(
-    s_dir: Path, crfs: list[str], target_voxel_size: float = 1.65, **kwargs
-):
-    dcm_file = s_dir / "ref" / "_sample.dcm"
-    suv_fac = get_suv_factor_from_dicom(dcm_file, **kwargs)
-
-    subject_dict = {}
-    subject_dict["suv_fac"] = suv_fac
-    subject_dict["s_dir"] = s_dir
-
-    img_keys = []
-
-    for d in crfs:
-        dfiles = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))
-        if len(dfiles) > 0:
-            dfile = dfiles[0]
-            subject_dict[f"{d}_file"] = dfile
-            subject_dict[f"{d}"] = tio.ScalarImage(dfile)
-            img_keys.append(d)
-
-    subject_dict["crfs"] = img_keys
-
-    return subject_dict
-
-
-def psnr(output, targets, data_range: float):
-    # compute psnr per sample in batch
-    # pnsr of torchmetrics has memory leak
-    mse_per_elem = F.mse_loss(output, targets, reduction="none")
-    # spatial/channel dims to reduce to per-sample values
-    dims = tuple(range(1, mse_per_elem.ndim))
-
-    # per-sample MSE
-    mse_per_sample = mse_per_elem.mean(dim=dims)
-
-    # Exclude samples where the target is completely empty (all zeros)
-    target_min = targets.amin(dim=dims)
-    target_max = targets.amax(dim=dims)
-    valid_target_mask = ~((target_min == 0) & (target_max == 0))
-
-    # Also exclude samples where mse is exactly zero (would lead to inf PSNR)
-    nonzero_mse_mask = mse_per_sample != 0
-
-    mask = valid_target_mask & nonzero_mse_mask
-
-    # If no valid samples remain, return NaN to indicate undefined PSNR
-    if mask.numel() == 0 or mask.sum() == 0:
-        return float("nan")
-
-    mse_per_sample = mse_per_sample[mask]
-
-    psnr_per_sample = 10 * torch.log10((data_range**2) / mse_per_sample)
-
-    # return mean PSNR across valid samples as float
-    return psnr_per_sample.mean().item()
 
 
 def nrmse(output, targets, data_range: float):
-    # compute psnr per sample in batch
-    # pnsr of torchmetrics has memory leak
     mse_per_elem = F.mse_loss(output, targets, reduction="none")
     # spatial/channel dims to reduce to per-sample values
     dims = tuple(range(1, mse_per_elem.ndim))
@@ -191,9 +136,10 @@ def patch_inference(
     subject: tio.Subject,
     scripted_model_path: Path,
     count_reduction_factor=10,
-    patch_size=64,
-    patch_overlap=32,
+    patch_size=96,
+    patch_overlap=48,
     batch_size=20,
+    verbose=False,
 ):
 
     grid_sampler = tio.inference.GridSampler(
@@ -211,13 +157,23 @@ def patch_inference(
 
     model.eval()
     with torch.no_grad():
-        for patches_batch in patch_loader:
-            input_tensor = patches_batch[f"{count_reduction_factor}"][tio.DATA].to(
-                device
+        for i, patches_batch in enumerate(patch_loader):
+            if verbose:
+                print(
+                    f"Processing patch batch {(i+1):04}/{len(patch_loader):04}",
+                    end="\r",
+                )
+            input_tensor = (
+                patches_batch[f"{count_reduction_factor}"][tio.DATA]
+                .to(torch.float32)
+                .to(device)
             )
             locations = patches_batch[tio.LOCATION].to(device)
             outputs = model(input_tensor)
             aggregator.add_batch(outputs, locations)
+
+    if verbose:
+        print("")  # newline after progress
 
     return aggregator.get_output_tensor()
 
@@ -231,20 +187,36 @@ def val_subject_nrmse(
     count_reduction_factor: int,
     save_path: None | Path = None,
     norm_factor: float = 1.0,
+    crop: bool = True,
+    verbose: bool = True,
     **kwargs,
 ):
     transform = tio.Compose([tio.transforms.ToCanonical()])
 
+    if verbose:
+        print(f"Loading {s_dir.name}")
+
     subject = transform(
-        tio.Subject(get_subject_dict(s_dir, crfs=[str(count_reduction_factor), "ref"]))
+        tio.Subject(
+            get_subject_dict(
+                s_dir, crfs=[str(count_reduction_factor), "ref"], crop=crop
+            )
+        )
     )
+
+    if verbose:
+        print(f"Running inference on {s_dir.name}")
 
     output_tensor = patch_inference(
         subject,
         model_path,
         count_reduction_factor=count_reduction_factor,
+        verbose=verbose,
         **kwargs,
     )
+
+    if verbose:
+        print(f"Computing NRMSE on {s_dir.name}")
 
     metric = nrmse(
         output_tensor.unsqueeze(0),
@@ -252,25 +224,31 @@ def val_subject_nrmse(
         norm_factor,
     )
 
+    if verbose:
+        print(f"writing outputs to {save_path}")
+
     # dump arrays to numpy files (for quick loading / viewing)
     if save_path is not None:
         if not save_path.exists():
             save_path.mkdir(parents=True, exist_ok=True)
         affine = subject["ref"].affine
-        nib.save(
-            nib.Nifti1Image(
-                subject[f"{count_reduction_factor}"].data.numpy().squeeze(), affine
-            ),
-            save_path / "input.nii.gz",
-        )
+        # nib.save(
+        #    nib.Nifti1Image(
+        #        subject[f"{count_reduction_factor}"].data.numpy().squeeze(), affine
+        #    ),
+        #    save_path / "input.nii",
+        # )
         nib.save(
             nib.Nifti1Image(output_tensor.cpu().numpy().squeeze(), affine),
-            save_path / "out.nii.gz",
+            save_path / "out.nii",
         )
-        nib.save(
-            nib.Nifti1Image(subject["ref"].data.numpy().squeeze(), affine),
-            save_path / "ref.nii.gz",
-        )
+        # nib.save(
+        #    nib.Nifti1Image(subject["ref"].data.numpy().squeeze(), affine),
+        #    save_path / "ref.nii",
+        # )
+
+    if verbose:
+        print(f"finished")
 
     return metric
 
