@@ -5,10 +5,13 @@ import torch
 import torch.nn.functional as F
 import torchio as tio
 import nibabel as nib
+import numpy as bp
 
 from pathlib import Path
 from time import strptime
 from datetime import timedelta
+
+from scipy.ndimage import gaussian_filter
 
 
 def get_suv_factor_from_dicom(dcm_file: Path, use_series_time: bool = True) -> float:
@@ -270,3 +273,8 @@ def val_subject_nrmse(
         )
 
     return metric
+
+
+def noise_metric(vol):
+    vol_sm = gaussian_filter(vol, 2.0)
+    return float(np.abs(vol - vol_sm).sum() / (vol_sm > 0.1).sum())

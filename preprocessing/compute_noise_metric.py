@@ -7,13 +7,7 @@ from pathlib import Path
 import pydicom
 from time import strptime
 from datetime import timedelta
-from scipy.ndimage import gaussian_filter
-
-
-def noise_metric(vol):
-    vol_sm = gaussian_filter(vol, 2.0)
-    return float(np.abs(vol - vol_sm).sum() / (vol_sm > 0.1).sum())
-
+from data import noise_metric
 
 random.seed(42)
 

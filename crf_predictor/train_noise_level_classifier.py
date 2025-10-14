@@ -23,8 +23,8 @@ from sklearn.metrics import (
 import joblib
 
 
-ROOT = Path(__file__).parent
-DATA_CSV = ROOT / "data_stats.csv"
+ROOT = Path(__file__).parent.parent
+DATA_CSV = ROOT / "data_stats" / "data_stats.csv"
 OUT_DIR = ROOT / "ML_noise_model"
 OUT_DIR.mkdir(exist_ok=True)
 
@@ -54,7 +54,15 @@ def load_and_prepare(csv_path: Path):
     )
     df["tracer"] = df["tracer"].fillna("Unknown")
 
-    features = ["noise_metric", "scantime_pi", "activity", "tracer", "bmi", "weight"]
+    features = [
+        "noise_metric",
+        "scantime_pi",
+        "activity",
+        "tracer",
+        "bmi",
+        "weight",
+        "scanner",
+    ]
     missing = [c for c in features if c not in df.columns]
     if missing:
         raise RuntimeError(f"Missing required columns in CSV: {missing}")
@@ -66,8 +74,14 @@ def load_and_prepare(csv_path: Path):
 
 
 def build_model():
-    numeric_features = ["noise_metric", "scantime_pi", "bmi", "weight", "activity"]
-    categorical_features = ["tracer"]
+    numeric_features = [
+        "noise_metric",
+        "scantime_pi",
+        "bmi",
+        "weight",
+        "activity",
+    ]
+    categorical_features = ["tracer", "scanner"]
 
     numeric_transformer = Pipeline(steps=[("scaler", StandardScaler())])
     categorical_transformer = Pipeline(
