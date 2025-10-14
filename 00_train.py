@@ -118,9 +118,9 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 # read s_dirs from subjects.txt
 with open(train_sub_file, "r") as f:
-    training_s_dirs = [Path(line.strip()) for line in f.readlines()]
+    training_s_dirs = [mdir / Path(line.strip()) for line in f.readlines()]
 with open(val_sub_file, "r") as f:
-    validation_s_dirs = [Path(line.strip()) for line in f.readlines()]
+    validation_s_dirs = [mdir / Path(line.strip()) for line in f.readlines()]
 
 # check whether there are no mutual subjects in training and validation
 mutual = set(training_s_dirs).intersection(set(validation_s_dirs))
@@ -142,8 +142,6 @@ with open(output_dir / "training_dirs.json", "w") as f:
 
 with open(output_dir / "validation_dirs.json", "w") as f:
     json.dump([str(s) for s in validation_s_dirs], f, indent=4)
-
-breakpoint()
 
 # setup preprocessing transforms
 transform_list = [tio.transforms.ToCanonical()]
