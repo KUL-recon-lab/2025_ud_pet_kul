@@ -105,7 +105,7 @@ def get_subject_dict(
 
     for d in crfs:
         if crop:
-            dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}_cropped.nii"
+            dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}_cropped.nii.gz"
         else:
             dfile = s_dir / d / f"resampled_{target_voxel_size:.2f}.nii.gz"
         # dfile = sorted(list(s_dir.glob(f"{d}/*.nii.gz")))[0]

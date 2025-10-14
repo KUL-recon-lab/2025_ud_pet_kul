@@ -26,7 +26,7 @@ for s_dir in validation_s_dirs:
     new_affine[:3, 3] += ref_nii.affine[:3, :3] @ start
     new_affine = new_affine.astype(np.float32)
 
-    orfile = s_dir / "ref" / "resampled_1.65_cropped.nii"
+    orfile = s_dir / "ref" / "resampled_1.65_cropped.nii.gz"
     nib.save(nib.Nifti1Image(ref_vol[bbox], new_affine), orfile)
 
     for d in ["100", "50", "20", "10", "4"]:
