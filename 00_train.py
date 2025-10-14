@@ -168,6 +168,7 @@ training_patches_loader = tio.SubjectsLoader(
     training_patches_queue,
     batch_size=batch_size,
     num_workers=0,  # this must be 0
+    pin_memory=True,
 )
 
 # %%
