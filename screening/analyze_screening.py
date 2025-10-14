@@ -2,8 +2,13 @@ import pandas as pd
 import numpy as np
 import os
 from pathlib import Path
-from PIL import Image
 import re
+
+from reportlab.pdfgen import canvas as rl_canvas
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.utils import ImageReader
+from reportlab.lib.units import mm
+
 
 if os.name == "nt":
     mdir = Path(
@@ -27,17 +32,18 @@ df_screened["cat_name"] = df_screened["cat_name"].str.strip()
 
 for group, df_group in df_screened.groupby("cat_name"):
     print(f"Group: {group}, n={len(df_group)}\n")
-    # collect PNGs for this group
-    pngs: list[Path] = []
+    # collect PNGs for this group and keep acquisition label
+    pngs: list[tuple[Path, str]] = []
     for row in df_group.itertuples():
         mips_file = mdir / row.acq / "ref" / "resampled_1.65.nii.mip.png"
+        acq_label = str(row.acq)
         if mips_file.exists():
-            pngs.append(mips_file)
+            pngs.append((mips_file, acq_label))
         else:
-            # try alternate naming patterns (some files might be .mip.png or .mip.PNG)
+            # try alternate naming patterns (some files might be .mip.PNG)
             alt = mips_file.with_suffix(".mip.PNG")
             if alt.exists():
-                pngs.append(alt)
+                pngs.append((alt, acq_label))
 
     if len(pngs) == 0:
         print(f"  No PNGs found for group '{group}', skipping PDF creation.")
@@ -47,24 +53,53 @@ for group, df_group in df_screened.groupby("cat_name"):
     out_dir.mkdir(exist_ok=True)
     out_pdf = out_dir / f"{group}.pdf"
 
-    # open images and convert to RGB
-    pil_images = []
-    for p in pngs:
-        try:
-            im = Image.open(p)
-            if im.mode != "RGB":
-                im = im.convert("RGB")
-            pil_images.append(im)
-        except Exception as e:
-            print(f"  Warning: could not open {p}: {e}")
-
-    if len(pil_images) == 0:
-        print(f"  No valid images for group '{group}' after loading, skipping.")
-        continue
-
     try:
-        first, rest = pil_images[0], pil_images[1:]
-        first.save(out_pdf, "PDF", resolution=150, save_all=True, append_images=rest)
-        print(f"  Wrote PDF: {out_pdf} ({len(pil_images)} pages)")
+        c = rl_canvas.Canvas(str(out_pdf), pagesize=A4)
+        pw, ph = A4
+        margin = 12 * mm
+        header_h = 12 * mm
+
+        for idx, (p, acq_label) in enumerate(pngs):
+            try:
+                img = ImageReader(str(p))
+                iw, ih = img.getSize()
+            except Exception as e:
+                print(f"  Warning: could not read image {p}: {e}")
+                continue
+
+            avail_w = pw - 2 * margin
+            avail_h = ph - 2 * margin - header_h
+            scale = min(avail_w / iw, avail_h / ih)
+            draw_w = iw * scale
+            draw_h = ih * scale
+
+            header_x = pw / 2
+            header_y = ph - margin - (header_h / 2)
+            img_x = (pw - draw_w) / 2
+            img_y = margin
+
+            key = f"{group}_p{idx}"
+            c.bookmarkPage(key)
+            c.addOutlineEntry(str(acq_label), key, level=0, closed=False)
+
+            c.setFont("Helvetica-Bold", 12)
+            c.drawCentredString(header_x, header_y, str(acq_label))
+
+            try:
+                c.drawImage(
+                    img,
+                    img_x,
+                    img_y,
+                    width=draw_w,
+                    height=draw_h,
+                    preserveAspectRatio=True,
+                )
+            except Exception as e:
+                print(f"  Warning: could not draw image {p}: {e}")
+
+            c.showPage()
+
+        c.save()
+        print(f"  Wrote PDF: {out_pdf} ({len(pngs)} pages)")
     except Exception as e:
         print(f"  Error writing PDF for group '{group}': {e}")
