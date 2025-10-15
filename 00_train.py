@@ -37,7 +37,7 @@ parser.add_argument(
     default=16,
     help="Features in first level of the UNet",
 )  # lr in 1e-3, 3e-4, keep 4e-3
-parser.add_argument("--lr", type=float, default=4e-3, help="Learning rate")
+parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
 
 
 # keep MSE
