@@ -10,9 +10,14 @@ new_mdir = Path("/tmp/2025_ud_pet_challenge/nifti_out")
 if not new_mdir.exists():
     new_mdir.mkdir(parents=True, exist_ok=True)
 
+s_dirs = []
+
 # read s_dirs from subjects.txt
+with open("../train.txt", "r") as f:
+    s_dirs += [line.strip() for line in f.readlines()]
+
 with open("../val.txt", "r") as f:
-    s_dirs = [line.strip() for line in f.readlines()]
+    s_dirs += [line.strip() for line in f.readlines()]
 
 for i, s_dir in enumerate(s_dirs):
     s_dir_path = mdir / s_dir

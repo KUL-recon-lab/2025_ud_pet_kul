@@ -10,6 +10,7 @@ from data import get_subject_dict, nrmse, val_subject_nrmse
 from losses import RobustL1Loss
 from models import UNet3D
 from datetime import datetime
+from time import time
 
 parser = argparse.ArgumentParser(description="Train 3D UNet on PET data")
 # we need to run trainings for all 3 valid settings
@@ -21,9 +22,9 @@ parser.add_argument(
     choices=["10-20", "50-100", "4"],
 )
 parser.add_argument("--patch_size", type=int, default=96, help="Patch size")
-parser.add_argument("--queue_length", type=int, default=1000, help="Queue length")
+parser.add_argument("--queue_length", type=int, default=3450, help="Queue length")
 parser.add_argument(
-    "--samples_per_volume", type=int, default=50, help="Samples per volume"
+    "--samples_per_volume", type=int, default=40, help="Samples per volume"
 )
 parser.add_argument("--batch_size", type=int, default=20, help="Batch size")
 parser.add_argument("--num_epochs", type=int, default=20, help="Number of epochs")
@@ -137,7 +138,7 @@ with open(output_dir / "args.json", "w") as f:
     json.dump(vars(args), f, indent=4)
 
 # %%
-num_workers = 10
+num_workers = 44
 # norm factor for NRMS computed on log compressed SUV images
 normalized_data_range = 1.0  # exp(1)-1 = 1.71 SUV for uncompressed images
 
@@ -240,6 +241,7 @@ if num_epochs > 0:
     for epoch in range(1, num_epochs + 1):
         ############################################################################
         # training loop
+        t0 = time()
         model.train()
         batch_losses = torch.zeros(len(training_patches_loader))
         batch_nrmse = torch.zeros(len(training_patches_loader))
@@ -338,6 +340,8 @@ if num_epochs > 0:
         print(
             f"\nEpoch [{epoch:04}/{num_epochs:04}] val NRMSE: {val_nrmse_avg[epoch-1]:.4f} +- {val_nrmse_std[epoch-1]:.4f}"
         )
+        t1 = time()
+        print(f" Epoch time: {((t1-t0)/60):.1f} min")
 
         #########################################################################
         with open(output_dir / "train_metrics.csv", "a") as f:
