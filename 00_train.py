@@ -30,17 +30,17 @@ parser.add_argument("--batch_size", type=int, default=20, help="Batch size")
 parser.add_argument("--num_epochs", type=int, default=20, help="Number of epochs")
 
 # sweep parameters
-# lr in 1e-3, 3e-4
-parser.add_argument("--lr", type=float, default=4e-3, help="Learning rate")
-
 # start_features in 16, 32
 parser.add_argument(
     "--start_features",
     type=int,
     default=16,
     help="Features in first level of the UNet",
-)
-# sweep loss in MSE, RobustL1
+)  # lr in 1e-3, 3e-4, keep 4e-3
+parser.add_argument("--lr", type=float, default=4e-3, help="Learning rate")
+
+
+# keep MSE
 parser.add_argument(
     "--loss",
     type=str,
@@ -333,6 +333,12 @@ if num_epochs > 0:
                 patch_overlap=patch_size // 2,
                 batch_size=batch_size,
             )
+
+            # write val_batch_nrmse to file output_dir / val_nrmse_{epoch:04}.txt
+            with open(output_dir / f"val_nrmse.csv", "a") as f:
+                f.write(
+                    f"{epoch:04}, {s_dir.name}, {val_batch_nrmse[ivb].item():.6f}\n"
+                )
 
         val_nrmse_avg[epoch - 1] += val_batch_nrmse.mean().item()
         val_nrmse_std[epoch - 1] += val_batch_nrmse.std().item()
