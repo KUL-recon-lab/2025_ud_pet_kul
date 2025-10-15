@@ -27,7 +27,7 @@ parser.add_argument(
     "--samples_per_volume", type=int, default=40, help="Samples per volume"
 )
 parser.add_argument("--batch_size", type=int, default=20, help="Batch size")
-parser.add_argument("--num_epochs", type=int, default=20, help="Number of epochs")
+parser.add_argument("--num_epochs", type=int, default=40, help="Number of epochs")
 
 # sweep parameters
 # start_features in 16, 32
@@ -85,6 +85,18 @@ parser.add_argument(
 parser.add_argument(
     "--final_softplus", action="store_true", help="Use final Softplus instead of ReLU"
 )
+parser.add_argument(
+    "--num_train",
+    type=int,
+    default=-1,
+    help="Number of training subjects, use -1 (default) for all",
+)
+parser.add_argument(
+    "--num_val",
+    type=int,
+    default=-1,
+    help="Number of validation subjects, use -1 (default) for all",
+)
 
 
 args = parser.parse_args()
@@ -99,6 +111,8 @@ batch_size = args.batch_size
 lr = args.lr
 args.loss = args.loss
 num_epochs = args.num_epochs
+num_train = args.num_train
+num_val = args.num_val
 
 down_conv = not args.max_pool
 start_features = args.start_features
@@ -156,9 +170,13 @@ if len(mutual) > 0:
     raise ValueError(f"Mutual subjects in training and validation: {mutual}")
 
 # shuffle s_dirs - the are stored in order of the categories
-
 random.shuffle(training_s_dirs)
 random.shuffle(validation_s_dirs)
+
+if num_train > 0:
+    training_s_dirs = training_s_dirs[:num_train]
+if num_val > 0:
+    validation_s_dirs = validation_s_dirs[:num_val]
 
 subjects_list = []
 for i, s_dir in enumerate(training_s_dirs):
@@ -220,6 +238,9 @@ if num_epochs > 0:
         final_softplus=final_softplus,
     ).to(device)
     print(model)
+
+    print(f"number of training subjects: {len(training_s_dirs)}")
+    print(f"number of validation subjects: {len(validation_s_dirs)}")
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
@@ -335,7 +356,7 @@ if num_epochs > 0:
             )
 
             # write val_batch_nrmse to file output_dir / val_nrmse_{epoch:04}.txt
-            with open(output_dir / f"val_nrmse.csv", "a") as f:
+            with open(output_dir / f"val_sub_{ivb:03}" / f"val_nrmse.csv", "a") as f:
                 f.write(
                     f"{epoch:04}, {s_dir.name}, {val_batch_nrmse[ivb].item():.6f}\n"
                 )
