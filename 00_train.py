@@ -22,7 +22,7 @@ parser.add_argument(
     choices=["10-20", "50-100", "4"],
 )
 parser.add_argument("--patch_size", type=int, default=96, help="Patch size")
-parser.add_argument("--queue_length", type=int, default=3450, help="Queue length")
+parser.add_argument("--queue_length", type=int, default=1725, help="Queue length")
 parser.add_argument(
     "--samples_per_volume", type=int, default=40, help="Samples per volume"
 )
@@ -152,7 +152,7 @@ with open(output_dir / "args.json", "w") as f:
     json.dump(vars(args), f, indent=4)
 
 # %%
-num_workers = 44
+num_workers = 22
 # norm factor for NRMS computed on log compressed SUV images
 normalized_data_range = 1.0  # exp(1)-1 = 1.71 SUV for uncompressed images
 
