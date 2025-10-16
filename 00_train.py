@@ -1,3 +1,4 @@
+import os
 import random
 import argparse
 import json
@@ -112,8 +113,8 @@ with open("config.json", "r") as f:
     cfg = json.load(f)
 
 mdir = Path(cfg["mdir"])
-training_s_dirs = [Path(s) for s in cfg["training_s_dirs"]]
-validation_s_dirs = [Path(s) for s in cfg["validation_s_dirs"]]
+training_s_dirs = [mdir / s for s in cfg["training_s_dirs"]]
+validation_s_dirs = [mdir / s for s in cfg["validation_s_dirs"]]
 
 # seed all random number generators
 seed = 42
@@ -135,7 +136,13 @@ with open(output_dir / "args.json", "w") as f:
     json.dump(vars(args), f, indent=4)
 
 # %%
-num_workers = 22
+try:
+    nproc = len(os.sched_getaffinity(0))  # Linux: respects taskset/cgroups affinity
+except AttributeError:
+    import multiprocessing
+    nproc = multiprocessing.cpu_count()   # fallback (Windows/macOS)
+
+num_workers = nproc - 1
 # norm factor for NRMS computed on log compressed SUV images
 normalized_data_range = 1.0  # exp(1)-1 = 1.71 SUV for uncompressed images
 
