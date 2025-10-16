@@ -50,9 +50,10 @@ class SUVLogCompress(tio.Transform):
     Optionally restrict to specific image keys (e.g., ['full_dose']).
     """
 
-    def __init__(self, keys=None, **kwargs):
+    def __init__(self, keys=None, invert: bool = False, **kwargs):
         super().__init__(**kwargs)
         self.keys = keys
+        self.invert_transform = bool(invert)
 
     def apply_transform(self, subject: tio.Subject) -> tio.Subject:
         suv_fac = float(subject["suv_fac"])
@@ -61,11 +62,21 @@ class SUVLogCompress(tio.Transform):
             if self.keys is None
             else {k: subject[k] for k in self.keys if k in subject}
         )
+
+        inverse = getattr(self, "invert_transform", False)
+
         for img in images.values():
-            data = img.data.to(torch.float32)  # ensure float for log1p
-            # PET should be >= 0; if needed, clamp tiny negatives from interpolation
-            # data = data.clamp_min_(0)
-            img.set_data(torch.log1p(data * suv_fac))
+            src = img.data
+            x = src.to(torch.float32)
+
+            if not inverse:
+                y = torch.log1p(x * suv_fac)
+            else:
+                y = torch.expm1(x) / suv_fac
+
+            # preserve dtype
+            img.set_data(y.to(src.dtype))
+
         return subject
 
 
