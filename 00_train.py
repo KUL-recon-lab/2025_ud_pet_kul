@@ -54,27 +54,6 @@ parser.add_argument(
     "--num_levels", type=int, default=3, help="Number of levels in UNet"
 )
 
-# add mdir argument
-parser.add_argument(
-    "--mdir",
-    type=str,
-    default="/tmp/2025_ud_pet_challenge/nifti_out",
-    help="Main directory containing subject subdirectories",
-)
-# add arguments for train and val subject files
-parser.add_argument(
-    "--train_sub_file",
-    type=str,
-    default="train.txt",
-    help="File containing training subject directories",
-)
-parser.add_argument(
-    "--val_sub_file",
-    type=str,
-    default="val.txt",
-    help="File containing validation subject directories",
-)
-
 # max_pool instead of down_conv in True, False
 parser.add_argument(
     "--max_pool",
@@ -119,10 +98,6 @@ start_features = args.start_features
 num_levels = args.num_levels
 final_softplus = args.final_softplus
 
-mdir = Path(args.mdir)
-train_sub_file = Path(args.train_sub_file)
-val_sub_file = Path(args.val_sub_file)
-
 if crf_setting == "10-20":
     count_reduction_factors = [10, 20]
 elif crf_setting == "50-100":
@@ -131,6 +106,14 @@ elif crf_setting == "4":
     count_reduction_factors = [4]
 else:
     raise ValueError(f"Unknown crf_setting: {crf_setting}")
+
+# open config file containing, mdir, training_s_sdirs, validation_s_dirs
+with open("config.json", "r") as f:
+    cfg = json.load(f)
+
+mdir = Path(cfg["mdir"])
+training_s_dirs = [Path(s) for s in cfg["training_s_dirs"]]
+validation_s_dirs = [Path(s) for s in cfg["validation_s_dirs"]]
 
 # seed all random number generators
 seed = 42
@@ -157,12 +140,6 @@ num_workers = 22
 normalized_data_range = 1.0  # exp(1)-1 = 1.71 SUV for uncompressed images
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
-# read s_dirs from subjects.txt
-with open(train_sub_file, "r") as f:
-    training_s_dirs = [mdir / Path(line.strip()) for line in f.readlines()]
-with open(val_sub_file, "r") as f:
-    validation_s_dirs = [mdir / Path(line.strip()) for line in f.readlines()]
 
 # check whether there are no mutual subjects in training and validation
 mutual = set(training_s_dirs).intersection(set(validation_s_dirs))
