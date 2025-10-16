@@ -140,9 +140,10 @@ try:
     nproc = len(os.sched_getaffinity(0))  # Linux: respects taskset/cgroups affinity
 except AttributeError:
     import multiprocessing
-    nproc = multiprocessing.cpu_count()   # fallback (Windows/macOS)
 
-num_workers = nproc - 1
+    nproc = multiprocessing.cpu_count()  # fallback (Windows/macOS)
+
+num_workers = min(nproc - 1, 22)
 # norm factor for NRMS computed on log compressed SUV images
 normalized_data_range = 1.0  # exp(1)-1 = 1.71 SUV for uncompressed images
 
