@@ -1,0 +1,11 @@
+# uexp fdg train
+[x] Anonymous_ANO_20230304_2006087_121244 --> wrong weight
+[x] Anonymous_ANO_20220224_1709580_104139 --> tracer says FDG, but seems DOTA
+
+# biograph fdg train
+[x] 130622_4_20220613_133323 --> wrong weight
+[x] 03122021_1_20211203_165117 --> wrong weight???, very high SUVs, low injection dose
+
+# uexp nonfdg train
+[x] Anonymous_ANO_20220224_1703593_111906 --> wrong dose
+[x] Anonymous_ANO_20220219_1746459_165142 --> wrong weight?

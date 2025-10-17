@@ -1,12 +1,13 @@
 import nibabel as nib
 import numpy as np
+import json
 from pathlib import Path
 from scipy.ndimage import find_objects
 
-mdir = Path("/tmp/2025_ud_pet_challenge/nifti_out")
+with open("../data_stats/config_uexp_nonfdg.json", "r") as f:
+    data = json.load(f)
 
-with open("../val.txt", "r") as f:
-    validation_s_dirs = [mdir / Path(line.strip()) for line in f.readlines()]
+validation_s_dirs = [Path(data["mdir"]) / x for x in data["validation_s_dirs"]]
 
 for s_dir in validation_s_dirs:
     orfile = s_dir / "ref" / "resampled_1.65_cropped.nii.gz"
