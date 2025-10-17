@@ -30,7 +30,7 @@ uexp_fdg_df = df[
 
 # keep only those row where cat > 0, or the 83 first rows where cat is 0
 uexp_fdg_df_cat_gt_0 = uexp_fdg_df[uexp_fdg_df["cat"] > 0]
-uexp_fdg_df_cat_eq_0 = uexp_fdg_df[uexp_fdg_df["cat"] == 0].head(100)
+uexp_fdg_df_cat_eq_0 = uexp_fdg_df[uexp_fdg_df["cat"] == 0].head(83)
 uexp_fdg_df_filtered = pd.concat(
     [uexp_fdg_df_cat_gt_0, uexp_fdg_df_cat_eq_0], ignore_index=True
 )
