@@ -268,8 +268,7 @@ if num_epochs > 0:
             )
 
             print(
-                f"Epoch [{epoch:04}/{num_epochs:04}] Batch [{(batch_idx+1):03}/{len(training_patches_loader):03}] - loss: {loss.item():.2E} - NRMSE: {batch_nrmse[batch_idx]:.2E}",
-                end="\r",
+                f"Epoch [{epoch:04}/{num_epochs:04}] Batch [{(batch_idx+1):03}/{len(training_patches_loader):03}] - loss: {loss.item():.2E} - NRMSE: {batch_nrmse[batch_idx]:.2E}"
             )
 
         ########################################################################################
@@ -321,7 +320,7 @@ if num_epochs > 0:
         val_batch_nrmse = torch.zeros(len(validation_s_dirs))
         for ivb, s_dir in enumerate(validation_s_dirs):
             print(
-                f"Validating subject {ivb+1:03}/{len(validation_s_dirs):03}", end="\r"
+                f"Validating subject {ivb+1:03}/{len(validation_s_dirs):03}"
             )
 
             if ivb % 2 == 0 or (len(count_reduction_factors) == 1):
