@@ -126,7 +126,7 @@ if torch.cuda.is_available():
 # %% create an output directory starting with run followed by a date-time stamp
 # dont use tio for date time stamp
 dt_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-output_dir = Path(f"run_{cfg.stem}_{crf}_{dt_stamp}")
+output_dir = Path(f"run_{cfg_path.stem}_{crf}_{dt_stamp}")
 output_dir.mkdir(parents=True, exist_ok=True)
 print(f"Output directory: {output_dir}")
 
