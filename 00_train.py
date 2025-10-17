@@ -14,13 +14,19 @@ from datetime import datetime
 from time import time
 
 parser = argparse.ArgumentParser(description="Train 3D UNet on PET data")
+parser.add_argument(
+    "cfg_path",
+    type=str,
+    help="Path to json file containg training / validation subject directories",
+)
+
 # we need to run trainings for all 3 valid settings
 parser.add_argument(
-    "--crf_setting",
-    type=str,
-    default="10-20",
+    "--crf",
+    type=int,
+    default=100,
     help="Count reduction factor",
-    choices=["10-20", "50-100", "4"],
+    choices=[100, 50, 20, 10, 4],
 )
 parser.add_argument("--patch_size", type=int, default=96, help="Patch size")
 parser.add_argument("--queue_length", type=int, default=1725, help="Queue length")
@@ -83,7 +89,8 @@ args = parser.parse_args()
 
 # -------------------------------------------------------------------------------
 
-crf_setting = args.crf_setting
+cfg_path = Path(args.cfg_path)
+crf = args.crf
 patch_size = args.patch_size
 queue_length = args.queue_length
 samples_per_volume = args.samples_per_volume
@@ -94,22 +101,14 @@ num_epochs = args.num_epochs
 num_train = args.num_train
 num_val = args.num_val
 
+
 down_conv = not args.max_pool
 start_features = args.start_features
 num_levels = args.num_levels
 final_softplus = args.final_softplus
 
-if crf_setting == "10-20":
-    count_reduction_factors = [10, 20]
-elif crf_setting == "50-100":
-    count_reduction_factors = [50, 100]
-elif crf_setting == "4":
-    count_reduction_factors = [4]
-else:
-    raise ValueError(f"Unknown crf_setting: {crf_setting}")
-
 # open config file containing, mdir, training_s_sdirs, validation_s_dirs
-with open("config.json", "r") as f:
+with open(cfg_path, "r") as f:
     cfg = json.load(f)
 
 mdir = Path(cfg["mdir"])
@@ -127,7 +126,7 @@ if torch.cuda.is_available():
 # %% create an output directory starting with run followed by a date-time stamp
 # dont use tio for date time stamp
 dt_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-output_dir = Path(f"run_{dt_stamp}")
+output_dir = Path(f"run_{cfg.stem}_{crf}_{dt_stamp}")
 output_dir.mkdir(parents=True, exist_ok=True)
 print(f"Output directory: {output_dir}")
 
@@ -165,17 +164,8 @@ if num_val > 0:
 
 subjects_list = []
 for i, s_dir in enumerate(training_s_dirs):
-    if (i % 2 == 0) or (len(count_reduction_factors) == 1):
-        count_reduction_factor = count_reduction_factors[0]
-    else:
-        count_reduction_factor = count_reduction_factors[1]
-
     subjects_list.append(
-        tio.Subject(
-            get_subject_dict(
-                s_dir, input_str=str(count_reduction_factor), ref_str="ref"
-            )
-        )
+        tio.Subject(get_subject_dict(s_dir, input_str=str(crf), ref_str="ref"))
     )
 
 # save subset_dirs to file output_dir/subset_dirs.json
@@ -223,6 +213,7 @@ if num_epochs > 0:
         final_softplus=final_softplus,
     ).to(device)
     print(model)
+    print(cfg_path)
 
     print(f"number of training subjects: {len(training_s_dirs)}")
     print(f"number of validation subjects: {len(validation_s_dirs)}")
@@ -319,19 +310,12 @@ if num_epochs > 0:
         # validation loop
         val_batch_nrmse = torch.zeros(len(validation_s_dirs))
         for ivb, s_dir in enumerate(validation_s_dirs):
-            print(
-                f"Validating subject {ivb+1:03}/{len(validation_s_dirs):03}"
-            )
-
-            if ivb % 2 == 0 or (len(count_reduction_factors) == 1):
-                count_reduction_factor = count_reduction_factors[0]
-            else:
-                count_reduction_factor = count_reduction_factors[1]
+            print(f"Validating subject {ivb+1:03}/{len(validation_s_dirs):03}")
 
             val_batch_nrmse[ivb] = val_subject_nrmse(
                 s_dir,
                 output_dir / f"model_{epoch:04}_scripted.pt",
-                count_reduction_factor,
+                crf,
                 norm_factor=normalized_data_range,
                 save_path=output_dir / f"val_sub_{ivb:03}",
                 patch_size=patch_size,
