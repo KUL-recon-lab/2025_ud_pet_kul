@@ -35,13 +35,25 @@ uexp_fdg_df_filtered = pd.concat(
     [uexp_fdg_df_cat_gt_0, uexp_fdg_df_cat_eq_0], ignore_index=True
 )
 
+# 90% per cat into train
+uexp_fdg_df_train = uexp_fdg_df_filtered.groupby(
+    "cat", group_keys=False, observed=True
+).apply(lambda g: g.sample(frac=0.9, random_state=42))
+
+# remaining 10% per cat into val
+uexp_fdg_df_val = uexp_fdg_df_filtered.drop(uexp_fdg_df_train.index).copy()
 
 print(
-    uexp_fdg_df_filtered.groupby(["tracer_type", "scanner", "cat"])
+    uexp_fdg_df_train.groupby(["tracer_type", "scanner", "cat"])
     .size()
     .reset_index(name="count")
 )
 
+print(
+    uexp_fdg_df_val.groupby(["tracer_type", "scanner", "cat"])
+    .size()
+    .reset_index(name="count")
+)
 ################################################################################
 # do the same for comibnation tracer_type == "FDG" and scanner == "Biograph128_Vision Quadra Edge"
 biograph_fdg_df = df[
@@ -56,17 +68,43 @@ biograph_fdg_df_filtered = pd.concat(
     [biograph_fdg_df_cat_gt_0, biograph_fdg_df_cat_eq_0], ignore_index=True
 )
 
+
+# 90% per cat into train
+biograph_fdg_df_train = biograph_fdg_df_filtered.groupby(
+    "cat", group_keys=False, observed=True
+).apply(lambda g: g.sample(frac=0.9, random_state=42))
+
+# remaining 10% per cat into val
+biograph_fdg_df_val = biograph_fdg_df_filtered.drop(biograph_fdg_df_train.index).copy()
+
 print(
-    biograph_fdg_df_filtered.groupby(["tracer_type", "scanner", "cat"])
+    biograph_fdg_df_train.groupby(["tracer_type", "scanner", "cat"])
     .size()
     .reset_index(name="count")
 )
 
-
+print(
+    biograph_fdg_df_val.groupby(["tracer_type", "scanner", "cat"])
+    .size()
+    .reset_index(name="count")
+)
 ################################################################################
 # get all non-FDG tracers
 uexp_nonfdg_df = df[df["tracer_type"] == "non-FDG"]
 
+# take first 90% into train
+uexp_nonfdg_df_train = uexp_nonfdg_df.sample(frac=0.8, random_state=42)
+# remaining 10% into val
+uexp_nonfdg_df_val = uexp_nonfdg_df.drop(uexp_nonfdg_df_train.index).copy()
+
 print(
-    uexp_nonfdg_df.groupby(["tracer_type", "scanner"]).size().reset_index(name="count")
+    uexp_nonfdg_df_train.groupby(["tracer_type", "scanner"])
+    .size()
+    .reset_index(name="count")
+)
+
+print(
+    uexp_nonfdg_df_val.groupby(["tracer_type", "scanner"])
+    .size()
+    .reset_index(name="count")
 )
