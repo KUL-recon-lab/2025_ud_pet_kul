@@ -1,5 +1,9 @@
 import pandas as pd
+import json
 
+mdir = (
+    "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/nifti_out"
+)
 df = pd.read_csv("data_stats.csv")
 
 # get the df where recon == "ref"
@@ -54,6 +58,16 @@ print(
     .size()
     .reset_index(name="count")
 )
+
+# write a file config_uexp_fdg.json with the acq of the train and val
+config_uexp_fdg = {
+    "mdir": mdir,
+    "training_s_dirs": uexp_fdg_df_train["acq"].tolist(),
+    "validation_s_dirs": uexp_fdg_df_val["acq"].tolist(),
+}
+with open("config_uexp_fdg.json", "w") as f:
+    json.dump(config_uexp_fdg, f, indent=4)
+
 ################################################################################
 # do the same for comibnation tracer_type == "FDG" and scanner == "Biograph128_Vision Quadra Edge"
 biograph_fdg_df = df[
@@ -88,6 +102,16 @@ print(
     .size()
     .reset_index(name="count")
 )
+
+# write a file config_biograph_fdg.json with the acq of the train and val
+config_biograph_fdg = {
+    "mdir": mdir,
+    "training_s_dirs": biograph_fdg_df_train["acq"].tolist(),
+    "validation_s_dirs": biograph_fdg_df_val["acq"].tolist(),
+}
+with open("config_biograph_fdg.json", "w") as f:
+    json.dump(config_biograph_fdg, f, indent=4)
+
 ################################################################################
 # get all non-FDG tracers
 uexp_nonfdg_df = df[df["tracer_type"] == "non-FDG"]
@@ -108,3 +132,13 @@ print(
     .size()
     .reset_index(name="count")
 )
+
+# write a file config_uexp_nonfdg.json with the acq of the train and val
+config_uexp_nonfdg = {
+    "mdir": mdir,
+    "training_s_dirs": uexp_nonfdg_df_train["acq"].tolist(),
+    "validation_s_dirs": uexp_nonfdg_df_val["acq"].tolist(),
+}
+
+with open("config_uexp_nonfdg.json", "w") as f:
+    json.dump(config_uexp_nonfdg, f, indent=4)
