@@ -22,9 +22,8 @@ parser.add_argument(
 
 # we need to run trainings for all 3 valid settings
 parser.add_argument(
-    "--crf",
+    "crf",
     type=int,
-    default=100,
     help="Count reduction factor",
     choices=[100, 50, 20, 10, 4],
 )
@@ -34,7 +33,7 @@ parser.add_argument(
     "--samples_per_volume", type=int, default=40, help="Samples per volume"
 )
 parser.add_argument("--batch_size", type=int, default=20, help="Batch size")
-parser.add_argument("--num_epochs", type=int, default=40, help="Number of epochs")
+parser.add_argument("--num_epochs", type=int, default=30, help="Number of epochs")
 
 # sweep parameters
 # start_features in 16, 32
