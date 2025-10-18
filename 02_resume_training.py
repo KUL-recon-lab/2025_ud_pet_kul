@@ -39,6 +39,7 @@ num_levels = args_dict["num_levels"]
 down_conv = not args_dict["max_pool"]
 final_softplus = args_dict["final_softplus"]
 loss = args_dict["loss"]
+crf = args_dict["crf"]
 
 # read training_dirs.json into the list training_s_dirs
 with open(output_dir / "training_dirs.json", "r") as f:
@@ -49,15 +50,6 @@ training_s_dirs = [Path(s) for s in training_s_dirs]
 with open(output_dir / "validation_dirs.json", "r") as f:
     validation_s_dirs = json.load(f)
 validation_s_dirs = [Path(s) for s in validation_s_dirs]
-
-if args_dict["crf_setting"] == "10-20":
-    count_reduction_factors = [10, 20]
-elif args_dict["crf_setting"] == "50-100":
-    count_reduction_factors = [50, 100]
-elif args_dict["crf_setting"] == "4":
-    count_reduction_factors = [4]
-else:
-    raise ValueError(f"Unknown crf_setting: {args_dict['crf_setting']}")
 
 # find the last save ceckpoint in output_dir
 checkpoint_files = list(output_dir.glob("model_epoch_*.pth"))
@@ -78,17 +70,8 @@ device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # %%
 subjects_list = []
 for i, s_dir in enumerate(training_s_dirs):
-    if (i % 2 == 0) or (len(count_reduction_factors) == 1):
-        count_reduction_factor = count_reduction_factors[0]
-    else:
-        count_reduction_factor = count_reduction_factors[1]
-
     subjects_list.append(
-        tio.Subject(
-            get_subject_dict(
-                s_dir, input_str=str(count_reduction_factor), ref_str="ref"
-            )
-        )
+        tio.Subject(get_subject_dict(s_dir, input_str=str(crf), ref_str="ref"))
     )
 
 # setup preprocessing transforms
@@ -239,15 +222,10 @@ if num_epochs > 0:
                 f"Validating subject {ivb+1:03}/{len(validation_s_dirs):03}", end="\r"
             )
 
-            if ivb % 2 == 0 or (len(count_reduction_factors) == 1):
-                count_reduction_factor = count_reduction_factors[0]
-            else:
-                count_reduction_factor = count_reduction_factors[1]
-
             val_batch_nrmse[ivb] = val_subject_nrmse(
                 s_dir,
                 output_dir / f"model_{epoch:04}_scripted.pt",
-                count_reduction_factor,
+                crf,
                 norm_factor=normalized_data_range,
                 save_path=output_dir / f"val_sub_{ivb:03}",
                 patch_size=patch_size,
