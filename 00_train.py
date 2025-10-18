@@ -95,7 +95,7 @@ queue_length = args.queue_length
 samples_per_volume = args.samples_per_volume
 batch_size = args.batch_size
 lr = args.lr
-args.loss = args.loss
+loss = args.loss
 num_epochs = args.num_epochs
 num_train = args.num_train
 num_val = args.num_val
@@ -125,7 +125,7 @@ if torch.cuda.is_available():
 # %% create an output directory starting with run followed by a date-time stamp
 # dont use tio for date time stamp
 dt_stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-output_dir = Path(f"run_{cfg_path.stem}_{crf}_{dt_stamp}")
+output_dir = Path(f"run_{cfg_path.stem}_{crf}_{loss}_{dt_stamp}")
 output_dir.mkdir(parents=True, exist_ok=True)
 print(f"Output directory: {output_dir}")
 
@@ -219,12 +219,12 @@ if num_epochs > 0:
 
     optimizer = torch.optim.Adam(model.parameters(), lr=lr)
 
-    if args.loss == "MSE":
+    if loss == "MSE":
         criterion = torch.nn.MSELoss()
-    elif args.loss == "RobustL1":
+    elif loss == "RobustL1":
         criterion = RobustL1Loss(eps=1e-2)
     else:
-        raise ValueError(f"Unknown loss function: {args.loss}")
+        raise ValueError(f"Unknown loss function: {loss}")
 
     train_loss_avg = torch.zeros(num_epochs)
     train_loss_std = torch.zeros(num_epochs)
