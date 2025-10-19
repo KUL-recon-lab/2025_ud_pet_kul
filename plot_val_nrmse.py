@@ -21,13 +21,13 @@ for i, cfg_dir in enumerate(cfg_dirs):
         for k, md in enumerate(model_dirs):
             metrics = np.loadtxt(md / "train_metrics.csv", delimiter=",")
             val_nrmse = metrics[:, -2]
-            ax[j, i].loglog(
-                np.arange(1, val_nrmse.size + 1),
-                val_nrmse,
+            ax[j, i].semilogx(
+                np.arange(1, val_nrmse.size + 1)[5:],
+                val_nrmse[5:],
                 label=md.stem[11:].split("_2025")[0],
             )
         ax[j, i].grid(ls=":")
-        ax[j, i].set_xlim(2, None)
+        ax[j, i].set_xlim(None, 100)
         ax[j, i].legend(fontsize="xx-small")
 
         if j == 0:

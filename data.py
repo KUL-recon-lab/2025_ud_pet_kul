@@ -251,10 +251,10 @@ def val_subject_nrmse(
         if not save_path.exists():
             save_path.mkdir(parents=True, exist_ok=True)
         affine = subject["ref"].affine
-        nib.save(
-            nib.Nifti1Image(output_tensor.cpu().numpy().squeeze(), affine),
-            save_path / "out.nii",
-        )
+        # nib.save(
+        #    nib.Nifti1Image(output_tensor.cpu().numpy().squeeze(), affine),
+        #    save_path / "out.nii",
+        # )
 
     if verbose:
         print(f"finished")
