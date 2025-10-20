@@ -332,7 +332,7 @@ if num_epochs > 0:
         val_nrmse_std[epoch - 1] += val_batch_nrmse.std().item()
 
         print(
-            f"\nEpoch [{epoch:04}/{num_epochs:04}] val NRMSE: {val_nrmse_avg[epoch-1]:.4f} +- {val_nrmse_std[epoch-1]:.4f}"
+            f"\nEpoch [{epoch:04}/{num_epochs:04}] val NRMSE: {val_nrmse_avg[epoch-1]:.6f} +- {val_nrmse_std[epoch-1]:.6f}"
         )
         t1 = time()
         print(f" Epoch time: {((t1-t0)/60):.1f} min")
@@ -340,5 +340,5 @@ if num_epochs > 0:
         #########################################################################
         with open(output_dir / "train_metrics.csv", "a") as f:
             f.write(
-                f"{epoch}, {train_loss_avg[epoch-1]:.3E}, {train_loss_std[epoch-1]:.3E}, {train_nrmse_avg[epoch-1]:.4f}, {train_nrmse_std[epoch-1]:.4f}, {val_nrmse_avg[epoch-1]:.4f}, {val_nrmse_std[epoch-1]:.4f}\n"
+                f"{epoch}, {train_loss_avg[epoch-1]:.3E}, {train_loss_std[epoch-1]:.3E}, {train_nrmse_avg[epoch-1]:.6f}, {train_nrmse_std[epoch-1]:.6f}, {val_nrmse_avg[epoch-1]:.6f}, {val_nrmse_std[epoch-1]:.6f}\n"
             )
