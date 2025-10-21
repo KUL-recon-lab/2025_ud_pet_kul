@@ -18,6 +18,7 @@ fig, ax = plt.subplots(
 for i, cfg_dir in enumerate(cfg_dirs):
     for j, crf in enumerate(crfs):
         model_dirs = sorted((cfg_dir / f"{crf}").glob("run_*"))
+        all_vals = []
         for k, md in enumerate(model_dirs):
             metrics = np.loadtxt(md / "train_metrics.csv", delimiter=",")
             val_nrmse = metrics[:, -2]
@@ -26,6 +27,22 @@ for i, cfg_dir in enumerate(cfg_dirs):
                 val_nrmse[5:],
                 label=md.stem[11:].split("_2025")[0],
             )
+            # collect values (skip first 5 epochs, same as plotting)
+            if val_nrmse.size > 5:
+                all_vals.append(val_nrmse[5:])
+        # set y-limits robustly by excluding outliers (use percentiles)
+        if all_vals:
+            concat = np.concatenate(all_vals)
+            # ignore NaNs if any
+            concat = concat[~np.isnan(concat)]
+            if concat.size > 0:
+                low = float(np.nanpercentile(concat, 5))
+                high = float(np.nanpercentile(concat, 95))
+                if high <= low:
+                    # fallback to min/max if percentiles degenerate
+                    low, high = float(np.nanmin(concat)), float(np.nanmax(concat))
+                pad = max(1e-6, 0.1 * (high - low))  # 10% padding
+                ax[j, i].set_ylim(low - pad, high + pad)
         ax[j, i].grid(ls=":")
         ax[j, i].set_xlim(None, 100)
         ax[j, i].legend(fontsize="xx-small")
