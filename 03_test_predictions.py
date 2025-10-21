@@ -9,50 +9,55 @@ from scipy.ndimage import gaussian_filter
 from pathlib import Path
 from data import SUVLogCompress, patch_inference
 
-out_dir = Path(
-    "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData/pred"
+import matplotlib as mpl
+
+mpl.rcParams.update(
+    {
+        "savefig.transparent": False,  # don’t write alpha
+        "savefig.facecolor": "white",  # solid background for saved figures
+        "figure.facecolor": "white",  # UI/background while drawing
+        "axes.facecolor": "white",
+    }
 )
-if not out_dir.exists():
-    out_dir.mkdir(parents=True, exist_ok=True)
 
 #############################
 # TO BE FINALIZED
 model_mdir = Path("denoising_models")
 model_dict = {}
 model_dict[("uEXPLORER", 4)] = (
+    # model_mdir / "uexp_fdg" / "4" / "run_config_uexp_fdg_4_RobustL1_16_20251018_182651"
     model_mdir
     / "uexp_fdg"
     / "4"
-    / "run_config_uexp_fdg_4_RobustL1_16_20251018_182651"
-    / "model_0060_scripted.pt"
+    / "run_config_uexp_fdg_4_RobustL1_32_20251020_213648"
 )
 model_dict[("uEXPLORER", 10)] = (
     model_mdir
     / "uexp_fdg"
     / "10"
-    / "run_config_uexp_fdg_10_RobustL1_16_20251018_102329"
-    / "model_0060_scripted.pt"
+    / "run_config_uexp_fdg_10_RobustL1_32_20251020_213652"
+    # / "run_config_uexp_fdg_10_RobustL1_16_20251018_102329"
 )
 model_dict[("uEXPLORER", 20)] = (
     model_mdir
     / "uexp_fdg"
     / "20"
-    / "run_config_uexp_fdg_20_RobustL1_16_20251018_102328"
-    / "model_0060_scripted.pt"
+    / "run_config_uexp_fdg_20_RobustL1_32_20251020_213648"
+    # / "run_config_uexp_fdg_20_RobustL1_16_20251018_102328"
 )
 model_dict[("uEXPLORER", 50)] = (
     model_mdir
     / "uexp_fdg"
     / "50"
-    / "run_config_uexp_fdg_50_RobustL1_16_20251018_182638"
-    / "model_0060_scripted.pt"
+    / "run_config_uexp_fdg_50_RobustL1_32_20251020_213649"
+    # / "run_config_uexp_fdg_50_RobustL1_16_20251018_182638"
 )
 model_dict[("uEXPLORER", 100)] = (
     model_mdir
     / "uexp_fdg"
     / "100"
-    / "run_config_uexp_fdg_100_RobustL1_16_20251018_182635"
-    / "model_0060_scripted.pt"
+    / "run_config_uexp_fdg_100_RobustL1_32_20251020_220254"
+    # / "run_config_uexp_fdg_100_RobustL1_16_20251018_182635"
 )
 
 
@@ -61,36 +66,41 @@ model_dict[("Biograph128_Vision Quadra Edge", 4)] = (
     / "biograph_fdg"
     / "4"
     / "run_config_biograph_fdg_4_RobustL1_16_20251018_134655"
-    / "model_0060_scripted.pt"
 )
 model_dict[("Biograph128_Vision Quadra Edge", 10)] = (
     model_mdir
     / "biograph_fdg"
     / "10"
     / "run_config_biograph_fdg_10_RobustL1_16_20251018_134657"
-    / "model_0060_scripted.pt"
 )
 model_dict[("Biograph128_Vision Quadra Edge", 20)] = (
     model_mdir
     / "biograph_fdg"
     / "20"
     / "run_config_biograph_fdg_20_RobustL1_16_20251018_134642"
-    / "model_0060_scripted.pt"
 )
 model_dict[("Biograph128_Vision Quadra Edge", 50)] = (
     model_mdir
     / "biograph_fdg"
     / "50"
     / "run_config_biograph_fdg_50_RobustL1_16_20251018_224024"
-    / "model_0060_scripted.pt"
 )
 model_dict[("Biograph128_Vision Quadra Edge", 100)] = (
     model_mdir
     / "biograph_fdg"
     / "100"
     / "run_config_biograph_fdg_100_RobustL1_16_20251018_224023"
-    / "model_0060_scripted.pt"
 )
+
+# loop over model_dict and load scripted models
+for key, model_dir in model_dict.items():
+    # load training metrics from model_dir / "train_metrics.csv"
+    train_mets = np.loadtxt(model_dir / "train_metrics.csv", delimiter=",")
+    val_nrmse = train_mets[:, -2]
+    best_epoch = np.argmin(val_nrmse) + 1
+    scripted_model_path = model_dir / f"model_{best_epoch:04}_scripted.pt"
+    model_dict[key] = scripted_model_path
+    print(key, scripted_model_path, val_nrmse[best_epoch - 1])
 
 #############################
 
@@ -124,6 +134,15 @@ canonical_transform = tio.transforms.ToCanonical()
 
 # iterate over all rows in input_df
 for i, row in input_df.iterrows():
+    out_dir = (
+        Path(
+            "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData/pred"
+        )
+        / f"{row['SubjectID']}"
+    )
+    if not out_dir.exists():
+        out_dir.mkdir(parents=True, exist_ok=True)
+
     print(row)
     subject = canonical_transform(
         tio.Subject(
@@ -194,7 +213,7 @@ for i, row in input_df.iterrows():
         ax[4].set_title("AI denoised")
         fig.savefig(
             out_dir / f"{row['SubjectID']}_{row['DoseReductionFactor']:03}.mip1.png",
-            dpi=300,
+            dpi=100,
         )
         fig.show()
         plt.close(fig)
@@ -216,8 +235,8 @@ for i, row in input_df.iterrows():
         ax2[2].set_title("AI denoised (lognorm)")
 
         fig2.savefig(
-            out_dir / f"{row['SubjectID']}_{row['DoseReductionFactor']:03}.mip2.png",
-            dpi=300,
+            out_dir / f"zz{row['SubjectID']}_{row['DoseReductionFactor']:03}.mip2.png",
+            dpi=100,
         )
         fig2.show()
         plt.close(fig2)
