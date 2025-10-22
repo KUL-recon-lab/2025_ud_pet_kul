@@ -1,14 +1,12 @@
-import torch
 import torchio as tio
 import pandas as pd
-import pymirc.viewer as pv
 import matplotlib.pyplot as plt
 import numpy as np
+import json
 
 from scipy.ndimage import gaussian_filter
 from pathlib import Path
 from data import SUVLogCompress, patch_inference
-
 import matplotlib as mpl
 
 mpl.rcParams.update(
@@ -20,96 +18,11 @@ mpl.rcParams.update(
     }
 )
 
-#############################
-# TO BE FINALIZED
-model_mdir = Path("denoising_models")
-model_dict = {}
-model_dict[("uEXPLORER", 4)] = (
-    # model_mdir / "uexp_fdg" / "4" / "run_config_uexp_fdg_4_RobustL1_16_20251018_182651"
-    model_mdir
-    / "uexp_fdg"
-    / "4"
-    / "run_config_uexp_fdg_4_RobustL1_32_20251020_213648"
-)
-model_dict[("uEXPLORER", 10)] = (
-    model_mdir
-    / "uexp_fdg"
-    / "10"
-    / "run_config_uexp_fdg_10_RobustL1_32_20251020_213652"
-    # / "run_config_uexp_fdg_10_RobustL1_16_20251018_102329"
-)
-model_dict[("uEXPLORER", 20)] = (
-    model_mdir
-    / "uexp_fdg"
-    / "20"
-    / "run_config_uexp_fdg_20_RobustL1_32_20251020_213648"
-    # / "run_config_uexp_fdg_20_RobustL1_16_20251018_102328"
-)
-model_dict[("uEXPLORER", 50)] = (
-    model_mdir
-    / "uexp_fdg"
-    / "50"
-    / "run_config_uexp_fdg_50_RobustL1_32_20251020_213649"
-    # / "run_config_uexp_fdg_50_RobustL1_16_20251018_182638"
-)
-model_dict[("uEXPLORER", 100)] = (
-    model_mdir
-    / "uexp_fdg"
-    / "100"
-    / "run_config_uexp_fdg_100_RobustL1_32_20251020_220254"
-    # / "run_config_uexp_fdg_100_RobustL1_16_20251018_182635"
-)
-
-
-model_dict[("Biograph128_Vision Quadra Edge", 4)] = (
-    model_mdir
-    / "biograph_fdg"
-    / "4"
-    / "run_config_biograph_fdg_4_RobustL1_32_20251021_162907"
-    # / "run_config_biograph_fdg_4_RobustL1_16_20251018_134655"
-)
-model_dict[("Biograph128_Vision Quadra Edge", 10)] = (
-    model_mdir
-    / "biograph_fdg"
-    / "10"
-    / "run_config_biograph_fdg_10_RobustL1_32_20251021_162907"
-    # / "run_config_biograph_fdg_10_RobustL1_16_20251018_134657"
-)
-model_dict[("Biograph128_Vision Quadra Edge", 20)] = (
-    model_mdir
-    / "biograph_fdg"
-    / "20"
-    / "run_config_biograph_fdg_20_RobustL1_32_20251021_162807"
-    # / "run_config_biograph_fdg_20_RobustL1_16_20251018_134642"
-)
-model_dict[("Biograph128_Vision Quadra Edge", 50)] = (
-    model_mdir
-    / "biograph_fdg"
-    / "50"
-    / "run_config_biograph_fdg_50_RobustL1_32_20251021_162804"
-    # / "run_config_biograph_fdg_50_RobustL1_16_20251018_224024"
-)
-model_dict[("Biograph128_Vision Quadra Edge", 100)] = (
-    model_mdir
-    / "biograph_fdg"
-    / "100"
-    / "run_config_biograph_fdg_100_RobustL1_32_20251021_162801"
-    # / "run_config_biograph_fdg_100_RobustL1_16_20251018_224023"
-)
-
-# loop over model_dict and load scripted models
-for key, model_dir in model_dict.items():
-    # load training metrics from model_dir / "train_metrics.csv"
-    train_mets = np.loadtxt(model_dir / "train_metrics.csv", delimiter=",")
-    val_nrmse = train_mets[:, -2]
-    best_epoch = np.argmin(val_nrmse) + 1
-    scripted_model_path = model_dir / f"model_{best_epoch:04}_scripted.pt"
-    model_dict[key] = scripted_model_path
-    print(key, scripted_model_path, val_nrmse[best_epoch - 1])
-
-breakpoint()
-
-#############################
+################################################################################
+################################################################################
+# (1) read the test data set csv and create the SUV factor (factor that converts from Bq/ml to SUV)
+################################################################################
+################################################################################
 
 target_voxsize_mm: float = 1.65
 
@@ -131,15 +44,76 @@ input_df["A"] = (
 input_df["suv_fac"] = 1000 * input_df["PatientWeight_kg"] / input_df["A"]
 
 show = True
+
+################################################################################
+################################################################################
+# (2) create a model dictionary mapping (manufacturer, drf) -> model_path
+################################################################################
 ################################################################################
 
+# load models from inference_model_config.json
+cfg_path = Path(__file__).parent / "inference_model_config.json"
+if not cfg_path.exists():
+    raise FileNotFoundError(f"Missing config: {cfg_path}")
+with cfg_path.open("r", encoding="utf-8") as f:
+    cfg = json.load(f)
+
+base_dir = cfg.get("model_mdir")
+if base_dir:
+    base_dir = Path(base_dir)
+    if not base_dir.is_absolute():
+        base_dir = (Path(__file__).parent / base_dir).resolve()
+else:
+    base_dir = Path(__file__).parent
+
+model_dict = {}
+for entry in cfg.get("models", []):
+    manuf = entry["manufacturer"]
+    drf = int(entry["drf"])
+    model_dir = Path(entry["model_dir"])
+    if not model_dir.is_absolute():
+        model_dir = (base_dir / model_dir).resolve()
+
+    checkpoint = entry.get("checkpoint")
+    if checkpoint:
+        cp = Path(checkpoint)
+        if not cp.is_absolute():
+            cp = (model_dir / cp).resolve()
+        model_path = cp
+    else:
+        # choose best epoch by validation NRMSE from train_metrics.csv
+        metrics_path = model_dir / "train_metrics.csv"
+        if not metrics_path.exists():
+            raise FileNotFoundError(
+                f"Missing metrics at {metrics_path} for {manuf} DRF {drf}"
+            )
+        metrics = np.loadtxt(metrics_path, delimiter=",")
+        # assume val_nrmse is the second-to-last column
+        val_nrmse = metrics[:, -2]
+        best_epoch = int(np.nanargmin(val_nrmse)) + 1
+        model_path = (model_dir / f"model_{best_epoch:04}_scripted.pt").resolve()
+
+    model_dict[(manuf, drf)] = model_path
+    print("configured model:", (manuf, drf), "->", model_path)
+
+breakpoint()
+
+################################################################################
+################################################################################
+# (3) setup the resampling and intensity transform we need (data preprocessing)
+################################################################################
+################################################################################
 
 resample_transform = tio.Resample(target=target_voxsize_mm)
 intensity_norm_transform = SUVLogCompress()
 inverse_intensity_norm_transform = intensity_norm_transform.inverse()
 canonical_transform = tio.transforms.ToCanonical()
 
-# iterate over all rows in input_df
+################################################################################
+################################################################################
+# (4) iterate over all test data sets and do the prediction
+################################################################################
+################################################################################
 for i, row in input_df.iterrows():
     out_dir = (
         Path(
