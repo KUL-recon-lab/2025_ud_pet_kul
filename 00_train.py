@@ -8,7 +8,7 @@ import numpy as np
 
 from pathlib import Path
 from data import get_subject_dict, nrmse, val_subject_nrmse
-from losses import RobustL1Loss
+from losses import RobustL1Loss, l1_ssim_edge_loss_1, l1_ssim_edge_loss_2
 from models import UNet3D
 from datetime import datetime
 from time import time
@@ -51,7 +51,7 @@ parser.add_argument(
     "--loss",
     type=str,
     default="MSE",
-    choices=["MSE", "RobustL1"],
+    choices=["MSE", "RobustL1", "L1SSIMEdge1", "L1SSIMEdge2"],
     help="Loss function to use",
 )
 
@@ -223,6 +223,10 @@ if num_epochs > 0:
         criterion = torch.nn.MSELoss()
     elif loss == "RobustL1":
         criterion = RobustL1Loss(eps=1e-2)
+    elif loss == "L1SSIMEdge1":
+        criterion = l1_ssim_edge_loss_1
+    elif loss == "L1SSIMEdge2":
+        criterion = l1_ssim_edge_loss_2
     else:
         raise ValueError(f"Unknown loss function: {loss}")
 
