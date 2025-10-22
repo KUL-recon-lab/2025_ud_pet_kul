@@ -141,7 +141,7 @@ except AttributeError:
 
     nproc = multiprocessing.cpu_count()  # fallback (Windows/macOS)
 
-num_workers = min(nproc - 1, 22)
+num_workers = min(nproc - 1, 15)
 # norm factor for NRMS computed on log compressed SUV images
 normalized_data_range = 1.0  # exp(1)-1 = 1.71 SUV for uncompressed images
 
