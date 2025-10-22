@@ -141,7 +141,15 @@ for entry in cfg.get("models", []):
         metrics = np.loadtxt(metrics_path, delimiter=",")
         # assume val_nrmse is the second-to-last column
         val_nrmse = metrics[:, -2]
-        best_epoch = int(np.nanargmin(val_nrmse)) + 1
+        epochs = metrics[:, 0].astype(int)
+        best_row = int(np.nanargmin(val_nrmse)) + 1
+        best_epoch = epochs[np.nanargmin(val_nrmse)]
+
+        if best_row != best_epoch:
+            raise ValueError(
+                f"Epoch mismatch in {metrics_path}: row {best_row} vs epoch {best_epoch}"
+            )
+
         model_path = (model_dir / f"model_{best_epoch:04}_scripted.pt").resolve()
 
     model_dict[(manuf, drf)] = model_path
