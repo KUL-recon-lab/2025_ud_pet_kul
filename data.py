@@ -4,8 +4,8 @@ import pydicom
 import torch
 import torch.nn.functional as F
 import torchio as tio
-import nibabel as nib
 import numpy as np
+import matplotlib.pyplot as plt
 
 from pathlib import Path
 from time import strptime
@@ -209,6 +209,8 @@ def val_subject_nrmse(
     norm_factor: float = 1.0,
     crop: bool = True,
     verbose: bool = True,
+    loss_fct=None,
+    dev: torch.device = torch.device("cpu"),
     **kwargs,
 ):
     transform = tio.Compose([tio.transforms.ToCanonical()])
@@ -237,11 +239,15 @@ def val_subject_nrmse(
     if verbose:
         print(f"Computing NRMSE on {s_dir.name}")
 
-    metric = nrmse(
-        output_tensor.unsqueeze(0),
-        subject["ref"].data.unsqueeze(0).to(output_tensor.device),
-        norm_factor,
-    )
+    out = output_tensor.unsqueeze(0).to(dev)
+    ref = subject["ref"].data.unsqueeze(0).to(dev)
+
+    metric = nrmse(out, ref, norm_factor)
+
+    if loss_fct is not None:
+        loss_value = loss_fct(out, ref)
+    else:
+        loss_value = -1.0
 
     if verbose:
         print(f"writing outputs to {save_path}")
@@ -250,16 +256,26 @@ def val_subject_nrmse(
     if save_path is not None:
         if not save_path.exists():
             save_path.mkdir(parents=True, exist_ok=True)
-        affine = subject["ref"].affine
-        # nib.save(
-        #    nib.Nifti1Image(output_tensor.cpu().numpy().squeeze(), affine),
-        #    save_path / "out.nii",
-        # )
+
+        # calculate MIPs show in matplotlib figure and save
+        mip1 = torch.max(out.squeeze(), 0)[0].cpu().numpy().T
+        mip2 = np.flip(torch.max(out.squeeze(), 1)[0].cpu().numpy().T, 1)
+        mip3 = torch.max(ref.squeeze(), 0)[0].cpu().numpy().T
+        mip4 = np.flip(torch.max(ref.squeeze(), 1)[0].cpu().numpy().T, 1)
+
+        ims1 = dict(vmin=0, vmax=4, origin="lower", cmap="Greys")
+        fig, ax = plt.subplots(1, 4, figsize=(22, 12), layout="constrained")
+        ax[0].imshow(mip1, **ims1)
+        ax[1].imshow(mip2, **ims1)
+        ax[2].imshow(mip3, **ims1)
+        ax[3].imshow(mip4, **ims1)
+        fig.savefig(save_path / "out_mips.png")
+        plt.close(fig)
 
     if verbose:
         print(f"finished")
 
-    return metric
+    return metric, loss_value
 
 
 def noise_metric(vol):

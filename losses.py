@@ -97,5 +97,5 @@ class L1SSIMEdgeLoss(torch.nn.Module):
         return self.w_charb * l_charb + self.w_ssim * l_ssim + self.w_edge * l_edge
 
 
-l1_ssim_edge_loss_1 = L1SSIMEdgeLoss(w_charb=0.5, w_ssim=0.4)
-l1_ssim_edge_loss_2 = L1SSIMEdgeLoss(w_charb=0.5, w_ssim=0.3)
+l1_ssim_edge_loss_1 = L1SSIMEdgeLoss(w_charb=0.7, w_ssim=0.25)
+l1_ssim_edge_loss_2 = L1SSIMEdgeLoss(w_charb=0.5, w_ssim=0.4)
