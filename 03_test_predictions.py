@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 import argparse
+import nibabel as nib
 
 from scipy.ndimage import gaussian_filter
 from pathlib import Path
@@ -163,12 +164,10 @@ canonical_transform = tio.transforms.ToCanonical()
 ################################################################################
 ################################################################################
 for i, row in input_df.iterrows():
-    out_dir = (
-        Path(
-            "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData/pred2"
-        )
-        / f"{row['SubjectID']}"
+    out_dir = Path(
+        "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData/pred2"
     )
+
     if not out_dir.exists():
         out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -185,11 +184,11 @@ for i, row in input_df.iterrows():
     subject_resampled = resample_transform(subject)
     subject_resampled_normalized = intensity_norm_transform(subject_resampled)
 
+    model_path = model_dict[(row["ManufacturerModelName"], row["DoseReductionFactor"])]
+
     output_tensor = patch_inference(
         subject_resampled_normalized,
-        scripted_model_path=model_dict[
-            (row["ManufacturerModelName"], row["DoseReductionFactor"])
-        ],
+        scripted_model_path=model_path,
         patch_size=patch_size,
         patch_overlap=patch_overlap,
         batch_size=batch_size,
@@ -207,8 +206,20 @@ for i, row in input_df.iterrows():
     # undo resampling
     subject["output"] = tio.Resample(subject["input"])(out_subject_resampled["output"])
 
+    # write the output to nifti
+    nii = nib.Nifti1Image(
+        subject["output"].data.numpy().squeeze(), subject["output"].affine
+    )
+    nii.header["descrip"] = str(model_path).encode("utf-8")[-80:]
+    nib.save(nii, str(out_dir / row["NiftiFileName"]))
+
     ###
     if show:
+        mip_out_dir = out_dir / f"{row['SubjectID']}"
+
+        if not mip_out_dir.exists():
+            mip_out_dir.mkdir(parents=True, exist_ok=True)
+
         sm_fwhm_mm = 7.0
         asp = subject["input"].spacing[2] / subject["input"].spacing[0]
 
@@ -241,7 +252,8 @@ for i, row in input_df.iterrows():
         ax[2].set_title(f"Input {sm_fwhm_mm}mm smoothed")
         ax[4].set_title("AI denoised")
         fig.savefig(
-            out_dir / f"{row['SubjectID']}_{row['DoseReductionFactor']:03}.mip1.png",
+            mip_out_dir
+            / f"{row['SubjectID']}_{row['DoseReductionFactor']:03}.mip1.png",
             dpi=100,
         )
         fig.show()
@@ -264,7 +276,8 @@ for i, row in input_df.iterrows():
         ax2[2].set_title("AI denoised (lognorm)")
 
         fig2.savefig(
-            out_dir / f"zz{row['SubjectID']}_{row['DoseReductionFactor']:03}.mip2.png",
+            mip_out_dir
+            / f"zz{row['SubjectID']}_{row['DoseReductionFactor']:03}.mip2.png",
             dpi=100,
         )
         fig2.show()
