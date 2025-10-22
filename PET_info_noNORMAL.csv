@@ -1,0 +1,249 @@
+SubjectID,DoseReductionFactor,NiftiFileName,PatientWeight_kg,ImageUnits,PixelSpacing_x_mm,PixelSpacing_y_mm,SliceThickness_mm,Manufacturer,ManufacturerModelName,ReconstructionMethod,RadiopharmaceuticalName,TimeFromInjectionToAcquisition_s,RadionuclideTotalDose_Bq,RadionuclideHalfLife_s,DecayCorrection
+Anonymous-01,10,Anonymous-01_DRF-10.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3399,203500000,6588,START
+Anonymous-01,100,Anonymous-01_DRF-100.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3408,203500000,6588,START
+Anonymous-01,20,Anonymous-01_DRF-20.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3404,203500000,6588,START
+Anonymous-01,4,Anonymous-01_DRF-4.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3386,203500000,6588,START
+Anonymous-01,50,Anonymous-01_DRF-50.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3407,203500000,6588,START
+Anonymous-02,10,Anonymous-02_DRF-10.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3466,166500000,6588,START
+Anonymous-02,100,Anonymous-02_DRF-100.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3475,166500000,6588,START
+Anonymous-02,20,Anonymous-02_DRF-20.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3471,166500000,6588,START
+Anonymous-02,4,Anonymous-02_DRF-4.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3453,166500000,6588,START
+Anonymous-02,50,Anonymous-02_DRF-50.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3474,166500000,6588,START
+Anonymous-03,10,Anonymous-03_DRF-10.nii.gz,83,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6414,307100000,6588,START
+Anonymous-03,100,Anonymous-03_DRF-100.nii.gz,83,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6423,307100000,6588,START
+Anonymous-03,20,Anonymous-03_DRF-20.nii.gz,83,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6419,307100000,6588,START
+Anonymous-03,4,Anonymous-03_DRF-4.nii.gz,83,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6401,307100000,6588,START
+Anonymous-03,50,Anonymous-03_DRF-50.nii.gz,83,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6422,307100000,6588,START
+Anonymous-04,10,Anonymous-04_DRF-10.nii.gz,79,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4728,296000000,6588,START
+Anonymous-04,100,Anonymous-04_DRF-100.nii.gz,79,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4737,296000000,6588,START
+Anonymous-04,20,Anonymous-04_DRF-20.nii.gz,79,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4733,296000000,6588,START
+Anonymous-04,4,Anonymous-04_DRF-4.nii.gz,79,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4715,296000000,6588,START
+Anonymous-04,50,Anonymous-04_DRF-50.nii.gz,79,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4736,296000000,6588,START
+Anonymous-05,10,Anonymous-05_DRF-10.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4603,166500000,6588,START
+Anonymous-05,100,Anonymous-05_DRF-100.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4612,166500000,6588,START
+Anonymous-05,20,Anonymous-05_DRF-20.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4608,166500000,6588,START
+Anonymous-05,4,Anonymous-05_DRF-4.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4590,166500000,6588,START
+Anonymous-05,50,Anonymous-05_DRF-50.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4611,166500000,6588,START
+Anonymous-06,10,Anonymous-06_DRF-10.nii.gz,62,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3331,229400000,6588,START
+Anonymous-06,100,Anonymous-06_DRF-100.nii.gz,62,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3340,229400000,6588,START
+Anonymous-06,20,Anonymous-06_DRF-20.nii.gz,62,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3336,229400000,6588,START
+Anonymous-06,4,Anonymous-06_DRF-4.nii.gz,62,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3318,229400000,6588,START
+Anonymous-07,10,Anonymous-07_DRF-10.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3096,203500000,6588,START
+Anonymous-07,100,Anonymous-07_DRF-100.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3105,203500000,6588,START
+Anonymous-07,20,Anonymous-07_DRF-20.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3101,203500000,6588,START
+Anonymous-07,4,Anonymous-07_DRF-4.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3083,203500000,6588,START
+Anonymous-07,50,Anonymous-07_DRF-50.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3104,203500000,6588,START
+Anonymous-08,10,Anonymous-08_DRF-10.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3056,222000000,6588,START
+Anonymous-08,100,Anonymous-08_DRF-100.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3065,222000000,6588,START
+Anonymous-08,20,Anonymous-08_DRF-20.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3061,222000000,6588,START
+Anonymous-08,4,Anonymous-08_DRF-4.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3043,222000000,6588,START
+Anonymous-08,50,Anonymous-08_DRF-50.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3064,222000000,6588,START
+Anonymous-09,10,Anonymous-09_DRF-10.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4446,229400000,6588,START
+Anonymous-09,100,Anonymous-09_DRF-100.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4455,229400000,6588,START
+Anonymous-09,20,Anonymous-09_DRF-20.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4451,229400000,6588,START
+Anonymous-09,4,Anonymous-09_DRF-4.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4433,229400000,6588,START
+Anonymous-09,50,Anonymous-09_DRF-50.nii.gz,60,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4454,229400000,6588,START
+Anonymous-10,10,Anonymous-10_DRF-10.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4419,240500000,6588,START
+Anonymous-10,100,Anonymous-10_DRF-100.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4428,240500000,6588,START
+Anonymous-10,20,Anonymous-10_DRF-20.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4424,240500000,6588,START
+Anonymous-10,4,Anonymous-10_DRF-4.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4406,240500000,6588,START
+Anonymous-10,50,Anonymous-10_DRF-50.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4427,240500000,6588,START
+Anonymous-11,10,Anonymous-11_DRF-10.nii.gz,82,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6363,296000000,6588,START
+Anonymous-11,100,Anonymous-11_DRF-100.nii.gz,82,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6372,296000000,6588,START
+Anonymous-11,20,Anonymous-11_DRF-20.nii.gz,82,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6368,296000000,6588,START
+Anonymous-11,4,Anonymous-11_DRF-4.nii.gz,82,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6350,296000000,6588,START
+Anonymous-11,50,Anonymous-11_DRF-50.nii.gz,82,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6371,296000000,6588,START
+Anonymous-12,10,Anonymous-12_DRF-10.nii.gz,65,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3359,240500000,6588,START
+Anonymous-12,100,Anonymous-12_DRF-100.nii.gz,65,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3368,240500000,6588,START
+Anonymous-12,20,Anonymous-12_DRF-20.nii.gz,65,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3364,240500000,6588,START
+Anonymous-12,4,Anonymous-12_DRF-4.nii.gz,65,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3346,240500000,6588,START
+Anonymous-12,50,Anonymous-12_DRF-50.nii.gz,65,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3367,240500000,6588,START
+Anonymous-13,10,Anonymous-13_DRF-10.nii.gz,77,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2416,270100000,6588,START
+Anonymous-13,100,Anonymous-13_DRF-100.nii.gz,77,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2425,270100000,6588,START
+Anonymous-13,20,Anonymous-13_DRF-20.nii.gz,77,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2421,270100000,6588,START
+Anonymous-13,4,Anonymous-13_DRF-4.nii.gz,77,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2403,270100000,6588,START
+Anonymous-13,50,Anonymous-13_DRF-50.nii.gz,77,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2424,270100000,6588,START
+Anonymous-14,10,Anonymous-14_DRF-10.nii.gz,62,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6693,229400000,6588,START
+Anonymous-14,100,Anonymous-14_DRF-100.nii.gz,62,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6702,229400000,6588,START
+Anonymous-14,20,Anonymous-14_DRF-20.nii.gz,62,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6698,229400000,6588,START
+Anonymous-14,4,Anonymous-14_DRF-4.nii.gz,62,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6680,229400000,6588,START
+Anonymous-14,50,Anonymous-14_DRF-50.nii.gz,62,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6701,229400000,6588,START
+Anonymous-15,10,Anonymous-15_DRF-10.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2852,262700000,6588,START
+Anonymous-15,100,Anonymous-15_DRF-100.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2861,262700000,6588,START
+Anonymous-15,20,Anonymous-15_DRF-20.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2857,262700000,6588,START
+Anonymous-15,4,Anonymous-15_DRF-4.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2839,262700000,6588,START
+Anonymous-15,50,Anonymous-15_DRF-50.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2860,262700000,6588,START
+Anonymous-16,10,Anonymous-16_DRF-10.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2359,262700000,6588,START
+Anonymous-16,100,Anonymous-16_DRF-100.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2368,262700000,6588,START
+Anonymous-16,20,Anonymous-16_DRF-20.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2364,262700000,6588,START
+Anonymous-16,4,Anonymous-16_DRF-4.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2346,262700000,6588,START
+Anonymous-16,50,Anonymous-16_DRF-50.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2367,262700000,6588,START
+Anonymous-17,10,Anonymous-17_DRF-10.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2396,247900000,6588,START
+Anonymous-17,100,Anonymous-17_DRF-100.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2405,247900000,6588,START
+Anonymous-17,20,Anonymous-17_DRF-20.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2401,247900000,6588,START
+Anonymous-17,4,Anonymous-17_DRF-4.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2383,247900000,6588,START
+Anonymous-17,50,Anonymous-17_DRF-50.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2404,247900000,6588,START
+Anonymous-18,10,Anonymous-18_DRF-10.nii.gz,40,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4314,169460000,6588,START
+Anonymous-18,100,Anonymous-18_DRF-100.nii.gz,40,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4323,169460000,6588,START
+Anonymous-18,20,Anonymous-18_DRF-20.nii.gz,40,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4319,169460000,6588,START
+Anonymous-18,4,Anonymous-18_DRF-4.nii.gz,40,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4301,169460000,6588,START
+Anonymous-18,50,Anonymous-18_DRF-50.nii.gz,40,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4322,169460000,6588,START
+Anonymous-19,10,Anonymous-19_DRF-10.nii.gz,69,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2956,251600000,6588,START
+Anonymous-19,100,Anonymous-19_DRF-100.nii.gz,69,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2965,251600000,6588,START
+Anonymous-19,20,Anonymous-19_DRF-20.nii.gz,69,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2961,251600000,6588,START
+Anonymous-19,4,Anonymous-19_DRF-4.nii.gz,69,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2943,251600000,6588,START
+Anonymous-19,50,Anonymous-19_DRF-50.nii.gz,69,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2964,251600000,6588,START
+Anonymous-20,10,Anonymous-20_DRF-10.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2636,255300000,6588,START
+Anonymous-20,100,Anonymous-20_DRF-100.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2645,255300000,6588,START
+Anonymous-20,20,Anonymous-20_DRF-20.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2641,255300000,6588,START
+Anonymous-20,4,Anonymous-20_DRF-4.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2623,255300000,6588,START
+Anonymous-20,50,Anonymous-20_DRF-50.nii.gz,70,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2644,255300000,6588,START
+Anonymous-21,10,Anonymous-21_DRF-10.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2800,251600000,6588,START
+Anonymous-21,100,Anonymous-21_DRF-100.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2809,251600000,6588,START
+Anonymous-21,20,Anonymous-21_DRF-20.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2805,251600000,6588,START
+Anonymous-21,4,Anonymous-21_DRF-4.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2787,251600000,6588,START
+Anonymous-21,50,Anonymous-21_DRF-50.nii.gz,67,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2808,251600000,6588,START
+Anonymous-22,10,Anonymous-22_DRF-10.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2398,166500000,6588,START
+Anonymous-22,100,Anonymous-22_DRF-100.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2407,166500000,6588,START
+Anonymous-22,20,Anonymous-22_DRF-20.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2403,166500000,6588,START
+Anonymous-22,4,Anonymous-22_DRF-4.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2385,166500000,6588,START
+Anonymous-22,50,Anonymous-22_DRF-50.nii.gz,45,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2406,166500000,6588,START
+Anonymous-23,10,Anonymous-23_DRF-10.nii.gz,53,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3876,203130000,6588,START
+Anonymous-23,100,Anonymous-23_DRF-100.nii.gz,53,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3885,203130000,6588,START
+Anonymous-23,20,Anonymous-23_DRF-20.nii.gz,53,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3881,203130000,6588,START
+Anonymous-23,4,Anonymous-23_DRF-4.nii.gz,53,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3863,203130000,6588,START
+Anonymous-23,50,Anonymous-23_DRF-50.nii.gz,53,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3884,203130000,6588,START
+Anonymous-24,10,Anonymous-24_DRF-10.nii.gz,75,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3169,277500000,6588,START
+Anonymous-24,100,Anonymous-24_DRF-100.nii.gz,75,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3178,277500000,6588,START
+Anonymous-24,20,Anonymous-24_DRF-20.nii.gz,75,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3174,277500000,6588,START
+Anonymous-24,4,Anonymous-24_DRF-4.nii.gz,75,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3156,277500000,6588,START
+Anonymous-24,50,Anonymous-24_DRF-50.nii.gz,75,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3177,277500000,6588,START
+Anonymous-25,10,Anonymous-25_DRF-10.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3008,207200000,6588,START
+Anonymous-25,100,Anonymous-25_DRF-100.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3017,207200000,6588,START
+Anonymous-25,20,Anonymous-25_DRF-20.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3013,207200000,6588,START
+Anonymous-25,4,Anonymous-25_DRF-4.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2995,207200000,6588,START
+Anonymous-25,50,Anonymous-25_DRF-50.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,3016,207200000,6588,START
+Anonymous-26,10,Anonymous-26_DRF-10.nii.gz,50,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6614,181300000,6588,START
+Anonymous-26,100,Anonymous-26_DRF-100.nii.gz,50,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6623,181300000,6588,START
+Anonymous-26,20,Anonymous-26_DRF-20.nii.gz,50,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6619,181300000,6588,START
+Anonymous-26,4,Anonymous-26_DRF-4.nii.gz,50,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6601,181300000,6588,START
+Anonymous-26,50,Anonymous-26_DRF-50.nii.gz,50,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,6622,181300000,6588,START
+Anonymous-27,10,Anonymous-27_DRF-10.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2934,177600000,6588,START
+Anonymous-27,100,Anonymous-27_DRF-100.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2943,177600000,6588,START
+Anonymous-27,20,Anonymous-27_DRF-20.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2939,177600000,6588,START
+Anonymous-27,4,Anonymous-27_DRF-4.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2921,177600000,6588,START
+Anonymous-27,50,Anonymous-27_DRF-50.nii.gz,47,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2942,177600000,6588,START
+Anonymous-28,10,Anonymous-28_DRF-10.nii.gz,80,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4696,299700000,6588,START
+Anonymous-28,100,Anonymous-28_DRF-100.nii.gz,80,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4705,299700000,6588,START
+Anonymous-28,20,Anonymous-28_DRF-20.nii.gz,80,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4701,299700000,6588,START
+Anonymous-28,4,Anonymous-28_DRF-4.nii.gz,80,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4683,299700000,6588,START
+Anonymous-28,50,Anonymous-28_DRF-50.nii.gz,80,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,4704,299700000,6588,START
+Anonymous-29,10,Anonymous-29_DRF-10.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2701,196100000,6588,START
+Anonymous-29,100,Anonymous-29_DRF-100.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2710,196100000,6588,START
+Anonymous-29,20,Anonymous-29_DRF-20.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2706,196100000,6588,START
+Anonymous-29,4,Anonymous-29_DRF-4.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2688,196100000,6588,START
+Anonymous-29,50,Anonymous-29_DRF-50.nii.gz,55,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2709,196100000,6588,START
+Anonymous-30,10,Anonymous-30_DRF-10.nii.gz,48,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2630,177600000,6588,START
+Anonymous-30,100,Anonymous-30_DRF-100.nii.gz,48,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2639,177600000,6588,START
+Anonymous-30,20,Anonymous-30_DRF-20.nii.gz,48,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2635,177600000,6588,START
+Anonymous-30,4,Anonymous-30_DRF-4.nii.gz,48,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2617,177600000,6588,START
+Anonymous-30,50,Anonymous-30_DRF-50.nii.gz,48,BQML,1.666667,1.666667,2.886,UIH,uEXPLORER,3D iterative TOF PSF,Fluorodeoxyglucose,2638,177600000,6588,START
+Anonymous-31,10,Anonymous-31_DRF-10.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3698,155000000,6586.2,START
+Anonymous-31,100,Anonymous-31_DRF-100.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3715,155000000,6586.2,START
+Anonymous-31,20,Anonymous-31_DRF-20.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3707,155000000,6586.2,START
+Anonymous-31,4,Anonymous-31_DRF-4.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3671,155000000,6586.2,START
+Anonymous-31,50,Anonymous-31_DRF-50.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3713,155000000,6586.2,START
+Anonymous-32,10,Anonymous-32_DRF-10.nii.gz,71,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3581,212000000,6586.2,START
+Anonymous-32,100,Anonymous-32_DRF-100.nii.gz,71,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3598,212000000,6586.2,START
+Anonymous-32,20,Anonymous-32_DRF-20.nii.gz,71,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3590,212000000,6586.2,START
+Anonymous-32,4,Anonymous-32_DRF-4.nii.gz,71,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3554,212000000,6586.2,START
+Anonymous-32,50,Anonymous-32_DRF-50.nii.gz,71,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3596,212000000,6586.2,START
+Anonymous-33,10,Anonymous-33_DRF-10.nii.gz,98,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3998,285000000,6586.2,START
+Anonymous-33,100,Anonymous-33_DRF-100.nii.gz,98,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4015,285000000,6586.2,START
+Anonymous-33,20,Anonymous-33_DRF-20.nii.gz,98,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4007,285000000,6586.2,START
+Anonymous-33,4,Anonymous-33_DRF-4.nii.gz,98,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3971,285000000,6586.2,START
+Anonymous-33,50,Anonymous-33_DRF-50.nii.gz,98,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4013,285000000,6586.2,START
+Anonymous-34,10,Anonymous-34_DRF-10.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4681,244000000,6586.2,START
+Anonymous-34,20,Anonymous-34_DRF-20.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4690,244000000,6586.2,START
+Anonymous-34,50,Anonymous-34_DRF-50.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4696,244000000,6586.2,START
+Anonymous-34,100,Anonymous-34_DRF-100.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4698,244000000,6586.2,START
+Anonymous-34,4,Anonymous-34_DRF-4.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4654,244000000,6586.2,START
+Anonymous-35,10,Anonymous-35_DRF-10.nii.gz,79,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3893,243000000,6586.2,START
+Anonymous-35,20,Anonymous-35_DRF-20.nii.gz,79,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3902,243000000,6586.2,START
+Anonymous-35,50,Anonymous-35_DRF-50.nii.gz,79,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3908,243000000,6586.2,START
+Anonymous-35,100,Anonymous-35_DRF-100.nii.gz,79,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3910,243000000,6586.2,START
+Anonymous-35,4,Anonymous-35_DRF-4.nii.gz,79,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3866,243000000,6586.2,START
+Anonymous-36,4,Anonymous-36_DRF-4.nii.gz,65,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4243,187000000,6586.2,START
+Anonymous-36,10,Anonymous-36_DRF-10.nii.gz,65,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4270,187000000,6586.2,START
+Anonymous-36,20,Anonymous-36_DRF-20.nii.gz,65,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4279,187000000,6586.2,START
+Anonymous-36,50,Anonymous-36_DRF-50.nii.gz,65,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4285,187000000,6586.2,START
+Anonymous-36,100,Anonymous-36_DRF-100.nii.gz,65,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4287,187000000,6586.2,START
+Anonymous-37,4,Anonymous-37_DRF-4.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4195,198000000,6586.2,START
+Anonymous-37,10,Anonymous-37_DRF-10.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4222,198000000,6586.2,START
+Anonymous-37,20,Anonymous-37_DRF-20.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4231,198000000,6586.2,START
+Anonymous-37,50,Anonymous-37_DRF-50.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4237,198000000,6586.2,START
+Anonymous-37,100,Anonymous-37_DRF-100.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4239,198000000,6586.2,START
+Anonymous-38,10,Anonymous-38_DRF-10.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3924,162000000,6586.2,START
+Anonymous-38,100,Anonymous-38_DRF-100.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3941,162000000,6586.2,START
+Anonymous-38,20,Anonymous-38_DRF-20.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3933,162000000,6586.2,START
+Anonymous-38,4,Anonymous-38_DRF-4.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3897,162000000,6586.2,START
+Anonymous-38,50,Anonymous-38_DRF-50.nii.gz,51,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3939,162000000,6586.2,START
+Anonymous-39,4,Anonymous-39_DRF-4.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5788,244000000,6586.2,START
+Anonymous-39,10,Anonymous-39_DRF-10.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5815,244000000,6586.2,START
+Anonymous-39,20,Anonymous-39_DRF-20.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5824,244000000,6586.2,START
+Anonymous-39,50,Anonymous-39_DRF-50.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5830,244000000,6586.2,START
+Anonymous-39,100,Anonymous-39_DRF-100.nii.gz,82,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5832,244000000,6586.2,START
+Anonymous-40,10,Anonymous-40_DRF-10.nii.gz,88,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5605,267000000,6586.2,START
+Anonymous-40,20,Anonymous-40_DRF-20.nii.gz,88,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5614,267000000,6586.2,START
+Anonymous-40,50,Anonymous-40_DRF-50.nii.gz,88,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5620,267000000,6586.2,START
+Anonymous-40,100,Anonymous-40_DRF-100.nii.gz,88,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5622,267000000,6586.2,START
+Anonymous-40,4,Anonymous-40_DRF-4.nii.gz,88,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5578,267000000,6586.2,START
+Anonymous-41,10,Anonymous-41_DRF-10.nii.gz,120,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5010,372000000,6586.2,START
+Anonymous-41,20,Anonymous-41_DRF-20.nii.gz,120,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5019,372000000,6586.2,START
+Anonymous-41,50,Anonymous-41_DRF-50.nii.gz,120,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5025,372000000,6586.2,START
+Anonymous-41,100,Anonymous-41_DRF-100.nii.gz,120,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,5027,372000000,6586.2,START
+Anonymous-41,4,Anonymous-41_DRF-4.nii.gz,120,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4983,372000000,6586.2,START
+Anonymous-42,10,Anonymous-42_DRF-10.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4264,215000000,6586.2,START
+Anonymous-42,20,Anonymous-42_DRF-20.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4273,215000000,6586.2,START
+Anonymous-42,50,Anonymous-42_DRF-50.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4279,215000000,6586.2,START
+Anonymous-42,100,Anonymous-42_DRF-100.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4281,215000000,6586.2,START
+Anonymous-42,4,Anonymous-42_DRF-4.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4237,215000000,6586.2,START
+Anonymous-43,4,Anonymous-43_DRF-4.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4532,193000000,6586.2,START
+Anonymous-43,10,Anonymous-43_DRF-10.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4559,193000000,6586.2,START
+Anonymous-43,20,Anonymous-43_DRF-20.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4568,193000000,6586.2,START
+Anonymous-43,50,Anonymous-43_DRF-50.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4574,193000000,6586.2,START
+Anonymous-43,100,Anonymous-43_DRF-100.nii.gz,67,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4576,193000000,6586.2,START
+Anonymous-44,10,Anonymous-44_DRF-10.nii.gz,62,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3441,184000000,6586.2,START
+Anonymous-44,100,Anonymous-44_DRF-100.nii.gz,62,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3458,184000000,6586.2,START
+Anonymous-44,20,Anonymous-44_DRF-20.nii.gz,62,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3450,184000000,6586.2,START
+Anonymous-44,4,Anonymous-44_DRF-4.nii.gz,62,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3414,184000000,6586.2,START
+Anonymous-44,50,Anonymous-44_DRF-50.nii.gz,62,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3456,184000000,6586.2,START
+Anonymous-45,10,Anonymous-45_DRF-10.nii.gz,70,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3491,204000000,6586.2,START
+Anonymous-45,100,Anonymous-45_DRF-100.nii.gz,70,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3508,204000000,6586.2,START
+Anonymous-45,20,Anonymous-45_DRF-20.nii.gz,70,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3500,204000000,6586.2,START
+Anonymous-45,4,Anonymous-45_DRF-4.nii.gz,70,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3464,204000000,6586.2,START
+Anonymous-45,50,Anonymous-45_DRF-50.nii.gz,70,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3506,204000000,6586.2,START
+Anonymous-46,10,Anonymous-46_DRF-10.nii.gz,81,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3753,258000000,6586.2,START
+Anonymous-46,100,Anonymous-46_DRF-100.nii.gz,81,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3770,258000000,6586.2,START
+Anonymous-46,20,Anonymous-46_DRF-20.nii.gz,81,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3762,258000000,6586.2,START
+Anonymous-46,4,Anonymous-46_DRF-4.nii.gz,81,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3726,258000000,6586.2,START
+Anonymous-46,50,Anonymous-46_DRF-50.nii.gz,81,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3768,258000000,6586.2,START
+Anonymous-47,10,Anonymous-47_DRF-10.nii.gz,72,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3483,223000000,6586.2,START
+Anonymous-47,100,Anonymous-47_DRF-100.nii.gz,72,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3500,223000000,6586.2,START
+Anonymous-47,20,Anonymous-47_DRF-20.nii.gz,72,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3492,223000000,6586.2,START
+Anonymous-47,4,Anonymous-47_DRF-4.nii.gz,72,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3456,223000000,6586.2,START
+Anonymous-47,50,Anonymous-47_DRF-50.nii.gz,72,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,3498,223000000,6586.2,START
+Anonymous-48,10,Anonymous-48_DRF-10.nii.gz,74,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4095,221000000,6586.2,START
+Anonymous-48,100,Anonymous-48_DRF-100.nii.gz,74,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4112,221000000,6586.2,START
+Anonymous-48,20,Anonymous-48_DRF-20.nii.gz,74,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4104,221000000,6586.2,START
+Anonymous-48,4,Anonymous-48_DRF-4.nii.gz,74,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4068,221000000,6586.2,START
+Anonymous-49,10,Anonymous-49_DRF-10.nii.gz,85,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4256,246000000,6586.2,START
+Anonymous-49,100,Anonymous-49_DRF-100.nii.gz,85,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4273,246000000,6586.2,START
+Anonymous-49,20,Anonymous-49_DRF-20.nii.gz,85,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4265,246000000,6586.2,START
+Anonymous-49,4,Anonymous-49_DRF-4.nii.gz,85,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4229,246000000,6586.2,START
+Anonymous-49,50,Anonymous-49_DRF-50.nii.gz,85,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4271,246000000,6586.2,START
+Anonymous-50,10,Anonymous-50_DRF-10.nii.gz,53,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4041,151000000,6586.2,START
+Anonymous-50,100,Anonymous-50_DRF-100.nii.gz,53,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4058,151000000,6586.2,START
+Anonymous-50,20,Anonymous-50_DRF-20.nii.gz,53,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4050,151000000,6586.2,START
+Anonymous-50,4,Anonymous-50_DRF-4.nii.gz,53,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4014,151000000,6586.2,START
+Anonymous-50,50,Anonymous-50_DRF-50.nii.gz,53,BQML,1.65,1.65,1.65,SIEMENS,Biograph128_Vision Quadra Edge,WB PSF+TOF 4i5s RD85,Fluorodeoxyglucose,4056,151000000,6586.2,START

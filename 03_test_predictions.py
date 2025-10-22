@@ -3,6 +3,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+import argparse
 
 from scipy.ndimage import gaussian_filter
 from pathlib import Path
@@ -11,12 +12,57 @@ import matplotlib as mpl
 
 mpl.rcParams.update(
     {
-        "savefig.transparent": False,  # don’t write alpha
-        "savefig.facecolor": "white",  # solid background for saved figures
-        "figure.facecolor": "white",  # UI/background while drawing
+        "savefig.transparent": False,
+        "savefig.facecolor": "white",
+        "figure.facecolor": "white",
         "axes.facecolor": "white",
     }
 )
+
+# replace hard-coded vars with argparse (use parse_known_args so importing in notebooks/IDE won't fail)
+parser = argparse.ArgumentParser(description="Run test predictions")
+parser.add_argument(
+    "--sid",
+    type=int,
+    default=-1,
+    help="Subject ID number (matches Anonymous-<sid>)",
+    choices=list(range(1, 51)),
+)
+parser.add_argument(
+    "--df",
+    type=int,
+    default=-1,
+    help="DoseReductionFactor",
+    choices=[4, 10, 20, 50, 100],
+)
+parser.add_argument(
+    "--nomips",
+    action="store_true",
+    help="Whether to skip MIP writing",
+)
+parser.add_argument(
+    "--patch_size",
+    type=int,
+    default=96,
+    help="Patch size for inference",
+)
+parser.add_argument(
+    "--patch_overlap",
+    type=int,
+    default=48,
+    help="Patch overlap for inference",
+)
+parser.add_argument(
+    "--batch_size", type=int, default=20, help="Batch size for inference"
+)
+
+args = parser.parse_args()
+sid: int = args.sid
+df: int = args.df
+show: bool = not args.nomips
+patch_size: int = args.patch_size
+patch_overlap: int = args.patch_overlap
+batch_size: int = args.batch_size
 
 ################################################################################
 ################################################################################
@@ -30,7 +76,13 @@ test_input_dir = Path(
     "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData"
 )
 
-input_df = pd.read_csv(test_input_dir / "PET_info_noNORMAL.csv")
+input_df = pd.read_csv("PET_info_noNORMAL.csv")
+
+# filter to only SubjectID and DoseReductionFactor if specified
+if sid != -1:
+    input_df = input_df[input_df[f"SubjectID"] == f"Anonymous-{sid:02}"]
+if df != -1:
+    input_df = input_df[input_df["DoseReductionFactor"] == df]
 
 # calculate the injected dose decay corrected to the scan start time
 input_df["A"] = (
@@ -42,8 +94,6 @@ input_df["A"] = (
 ) * input_df["RadionuclideTotalDose_Bq"]
 
 input_df["suv_fac"] = 1000 * input_df["PatientWeight_kg"] / input_df["A"]
-
-show = True
 
 ################################################################################
 ################################################################################
@@ -96,8 +146,6 @@ for entry in cfg.get("models", []):
     model_dict[(manuf, drf)] = model_path
     print("configured model:", (manuf, drf), "->", model_path)
 
-breakpoint()
-
 ################################################################################
 ################################################################################
 # (3) setup the resampling and intensity transform we need (data preprocessing)
@@ -117,7 +165,7 @@ canonical_transform = tio.transforms.ToCanonical()
 for i, row in input_df.iterrows():
     out_dir = (
         Path(
-            "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData/pred"
+            "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData/pred2"
         )
         / f"{row['SubjectID']}"
     )
@@ -142,9 +190,9 @@ for i, row in input_df.iterrows():
         scripted_model_path=model_dict[
             (row["ManufacturerModelName"], row["DoseReductionFactor"])
         ],
-        patch_size=96,
-        patch_overlap=48,
-        batch_size=20,
+        patch_size=patch_size,
+        patch_overlap=patch_overlap,
+        batch_size=batch_size,
         verbose=True,
     ).cpu()
     subject_resampled_normalized["output"] = tio.ScalarImage(
