@@ -65,31 +65,36 @@ model_dict[("Biograph128_Vision Quadra Edge", 4)] = (
     model_mdir
     / "biograph_fdg"
     / "4"
-    / "run_config_biograph_fdg_4_RobustL1_16_20251018_134655"
+    / "run_config_biograph_fdg_4_RobustL1_32_20251021_162907"
+    # / "run_config_biograph_fdg_4_RobustL1_16_20251018_134655"
 )
 model_dict[("Biograph128_Vision Quadra Edge", 10)] = (
     model_mdir
     / "biograph_fdg"
     / "10"
-    / "run_config_biograph_fdg_10_RobustL1_16_20251018_134657"
+    / "run_config_biograph_fdg_10_RobustL1_32_20251021_162907"
+    # / "run_config_biograph_fdg_10_RobustL1_16_20251018_134657"
 )
 model_dict[("Biograph128_Vision Quadra Edge", 20)] = (
     model_mdir
     / "biograph_fdg"
     / "20"
-    / "run_config_biograph_fdg_20_RobustL1_16_20251018_134642"
+    / "run_config_biograph_fdg_20_RobustL1_32_20251021_162807"
+    # / "run_config_biograph_fdg_20_RobustL1_16_20251018_134642"
 )
 model_dict[("Biograph128_Vision Quadra Edge", 50)] = (
     model_mdir
     / "biograph_fdg"
     / "50"
-    / "run_config_biograph_fdg_50_RobustL1_16_20251018_224024"
+    / "run_config_biograph_fdg_50_RobustL1_32_20251021_162804"
+    # / "run_config_biograph_fdg_50_RobustL1_16_20251018_224024"
 )
 model_dict[("Biograph128_Vision Quadra Edge", 100)] = (
     model_mdir
     / "biograph_fdg"
     / "100"
-    / "run_config_biograph_fdg_100_RobustL1_16_20251018_224023"
+    / "run_config_biograph_fdg_100_RobustL1_32_20251021_162801"
+    # / "run_config_biograph_fdg_100_RobustL1_16_20251018_224023"
 )
 
 # loop over model_dict and load scripted models
@@ -101,6 +106,8 @@ for key, model_dir in model_dict.items():
     scripted_model_path = model_dir / f"model_{best_epoch:04}_scripted.pt"
     model_dict[key] = scripted_model_path
     print(key, scripted_model_path, val_nrmse[best_epoch - 1])
+
+breakpoint()
 
 #############################
 
