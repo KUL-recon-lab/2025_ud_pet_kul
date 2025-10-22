@@ -10,3 +10,4 @@ dependencies:
   - indexed_gzip=1.10.*
   - ipython=9.6.*
   - pandas=2.3.*
+  - pytorch-ignite=0.5.*
