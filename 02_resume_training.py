@@ -6,7 +6,7 @@ import torchio as tio
 
 from pathlib import Path
 from data import get_subject_dict, nrmse, val_subject_nrmse
-from losses import RobustL1Loss
+from losses import RobustL1Loss, l1_ssim_edge_loss_1, l1_ssim_edge_loss_2
 from models import UNet3D
 from time import time
 
@@ -136,6 +136,10 @@ if num_epochs > 0:
         criterion = torch.nn.MSELoss()
     elif loss == "RobustL1":
         criterion = RobustL1Loss(eps=1e-2)
+    elif loss == "L1SSIMEdge1":
+        criterion = l1_ssim_edge_loss_1
+    elif loss == "L1SSIMEdge2":
+        criterion = l1_ssim_edge_loss_2
     else:
         raise ValueError(f"Unknown loss function: {args.loss}")
 
@@ -146,6 +150,8 @@ if num_epochs > 0:
 
     val_nrmse_avg = torch.zeros(start_epoch + num_epochs)
     val_nrmse_std = torch.zeros(start_epoch + num_epochs)
+    val_loss_avg = torch.zeros(start_epoch + num_epochs)
+    val_loss_std = torch.zeros(start_epoch + num_epochs)
 
     for epoch in range(start_epoch + 1, start_epoch + num_epochs + 1):
         ############################################################################
@@ -222,12 +228,14 @@ if num_epochs > 0:
         ############################################################################
         # validation loop
         val_batch_nrmse = torch.zeros(len(validation_s_dirs))
+        val_batch_loss = torch.zeros(len(validation_s_dirs))
+
         for ivb, s_dir in enumerate(validation_s_dirs):
             print(
                 f"Validating subject {ivb+1:03}/{len(validation_s_dirs):03}", end="\r"
             )
 
-            val_batch_nrmse[ivb] = val_subject_nrmse(
+            val_batch_nrmse[ivb], val_batch_loss[ivb] = val_subject_nrmse(
                 s_dir,
                 output_dir / f"model_{epoch:04}_scripted.pt",
                 crf,
@@ -236,6 +244,8 @@ if num_epochs > 0:
                 patch_size=patch_size,
                 patch_overlap=patch_size // 2,
                 batch_size=batch_size,
+                loss_fct=criterion,
+                dev=device,
             )
 
             # write val_batch_nrmse to file output_dir / val_nrmse_{epoch:04}.txt
@@ -244,11 +254,17 @@ if num_epochs > 0:
                     f"{epoch:04}, {s_dir.name}, {val_batch_nrmse[ivb].item():.6f}\n"
                 )
 
+            with open(output_dir / f"val_sub_{ivb:03}" / f"val_loss.csv", "a") as f:
+                f.write(f"{epoch:04}, {s_dir.name}, {val_batch_loss[ivb].item():.6f}\n")
+
         val_nrmse_avg[epoch - 1] += val_batch_nrmse.mean().item()
         val_nrmse_std[epoch - 1] += val_batch_nrmse.std().item()
 
+        val_loss_avg[epoch - 1] += val_batch_loss.mean().item()
+        val_loss_std[epoch - 1] += val_batch_loss.std().item()
+
         print(
-            f"\nEpoch [{epoch:04}/{num_epochs:04}] val NRMSE: {val_nrmse_avg[epoch-1]:.6f} +- {val_nrmse_std[epoch-1]:.6f}"
+            f"\nEpoch [{epoch:04}/{num_epochs:04}] val NRMSE: {val_nrmse_avg[epoch-1]:.6f} +- {val_nrmse_std[epoch-1]:.6f} val loss: {val_loss_avg[epoch-1]:.3E} +- {val_loss_std[epoch-1]:.3E}"
         )
         t1 = time()
         print(f" Epoch time: {((t1-t0)/60):.1f} min")
@@ -257,4 +273,9 @@ if num_epochs > 0:
         with open(output_dir / "train_metrics.csv", "a") as f:
             f.write(
                 f"{epoch}, {train_loss_avg[epoch-1]:.3E}, {train_loss_std[epoch-1]:.3E}, {train_nrmse_avg[epoch-1]:.6f}, {train_nrmse_std[epoch-1]:.6f}, {val_nrmse_avg[epoch-1]:.6f}, {val_nrmse_std[epoch-1]:.6f}\n"
+            )
+
+        with open(output_dir / "val_loss.csv", "a") as f:
+            f.write(
+                f"{epoch}, {val_loss_avg[epoch-1]:.3E}, {val_loss_std[epoch-1]:.3E}\n"
             )
