@@ -56,6 +56,9 @@ parser.add_argument(
 parser.add_argument(
     "--batch_size", type=int, default=20, help="Batch size for inference"
 )
+parser.add_argument(
+    "--odir", type=str, default="pred3", help="sub directory for output predictions"
+)
 
 args = parser.parse_args()
 sid: int = args.sid
@@ -64,6 +67,7 @@ show: bool = not args.nomips
 patch_size: int = args.patch_size
 patch_overlap: int = args.patch_overlap
 batch_size: int = args.batch_size
+odir: str = args.odir
 
 ################################################################################
 ################################################################################
@@ -76,6 +80,12 @@ target_voxsize_mm: float = 1.65
 test_input_dir = Path(
     "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData"
 )
+
+out_dir = test_input_dir / odir
+
+if not out_dir.exists():
+    out_dir.mkdir(parents=True, exist_ok=True)
+
 
 input_df = pd.read_csv("PET_info_noNORMAL.csv")
 
@@ -132,25 +142,39 @@ for entry in cfg.get("models", []):
             cp = (model_dir / cp).resolve()
         model_path = cp
     else:
-        # choose best epoch by validation NRMSE from train_metrics.csv
-        metrics_path = model_dir / "train_metrics.csv"
-        if not metrics_path.exists():
-            raise FileNotFoundError(
-                f"Missing metrics at {metrics_path} for {manuf} DRF {drf}"
-            )
-        metrics = np.loadtxt(metrics_path, delimiter=",")
-        # assume val_nrmse is the second-to-last column
-        val_nrmse = metrics[:, -2]
-        epochs = metrics[:, 0].astype(int)
-        best_row = int(np.nanargmin(val_nrmse)) + 1
-        best_epoch = epochs[np.nanargmin(val_nrmse)]
+        val_loss_file = model_dir / "val_loss.csv"
+        if val_loss_file.exists():
+            val_loss_data = np.loadtxt(val_loss_file, delimiter=",")
+            epochs = val_loss_data[:, 0].astype(int)
+            val_loss = val_loss_data[:, 1]
+            best_row = int(np.nanargmin(val_loss)) + 1
+            best_epoch = int(epochs[np.nanargmin(val_loss)])
 
-        if best_row != best_epoch:
-            raise ValueError(
-                f"Epoch mismatch in {metrics_path}: row {best_row} vs epoch {best_epoch}"
-            )
+            if best_row != best_epoch:
+                raise ValueError(
+                    f"Epoch mismatch in {val_loss_file}: row {best_row} vs epoch {best_epoch}"
+                )
+            model_path = (model_dir / f"model_{best_epoch:04}_scripted.pt").resolve()
+        else:
+            # choose best epoch by validation NRMSE from train_metrics.csv
+            metrics_path = model_dir / "train_metrics.csv"
+            if not metrics_path.exists():
+                raise FileNotFoundError(
+                    f"Missing metrics at {metrics_path} for {manuf} DRF {drf}"
+                )
+            metrics = np.loadtxt(metrics_path, delimiter=",")
+            # assume val_nrmse is the second-to-last column
+            val_nrmse = metrics[:, -2]
+            epochs = metrics[:, 0].astype(int)
+            best_row = int(np.nanargmin(val_nrmse)) + 1
+            best_epoch = int(epochs[np.nanargmin(val_nrmse)])
 
-        model_path = (model_dir / f"model_{best_epoch:04}_scripted.pt").resolve()
+            if best_row != best_epoch:
+                raise ValueError(
+                    f"Epoch mismatch in {metrics_path}: row {best_row} vs epoch {best_epoch}"
+                )
+
+            model_path = (model_dir / f"model_{best_epoch:04}_scripted.pt").resolve()
 
     model_dict[(manuf, drf)] = model_path
     print("configured model:", (manuf, drf), "->", model_path)
@@ -172,13 +196,6 @@ canonical_transform = tio.transforms.ToCanonical()
 ################################################################################
 ################################################################################
 for i, row in input_df.iterrows():
-    out_dir = Path(
-        "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData/pred2"
-    )
-
-    if not out_dir.exists():
-        out_dir.mkdir(parents=True, exist_ok=True)
-
     print(row)
     subject = canonical_transform(
         tio.Subject(
