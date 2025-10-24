@@ -3,6 +3,18 @@
   "models": [
     {
       "manufacturer": "uEXPLORER",
+      "drf": 4,
+      "model_dir": "uexp_fdg/4/run_config_uexp_fdg_4_L1SSIMEdge1_32_20251023_092712",
+      "checkpoint": null
+    },
+    {
+      "manufacturer": "uEXPLORER",
+      "drf": 10,
+      "model_dir": "uexp_fdg/10/run_config_uexp_fdg_10_L1SSIMEdge1_32_20251023_073510",
+      "checkpoint": null
+    },
+    {
+      "manufacturer": "uEXPLORER",
       "drf": 20,
       "model_dir": "uexp_fdg/20/run_config_uexp_fdg_20_L1SSIMEdge1_32_20251022_180409",
       "checkpoint": null
@@ -17,6 +29,24 @@
       "manufacturer": "uEXPLORER",
       "drf": 100,
       "model_dir": "uexp_fdg/100/run_config_uexp_fdg_100_L1SSIMEdge1_32_20251022_210418",
+      "checkpoint": null
+    },
+    {
+      "manufacturer": "Biograph128_Vision Quadra Edge",
+      "drf": 4,
+      "model_dir": "biograph_fdg/4/run_config_biograph_fdg_4_L1SSIMEdge1_32_20251023_222125",
+      "checkpoint": null
+    },
+    {
+      "manufacturer": "Biograph128_Vision Quadra Edge",
+      "drf": 10,
+      "model_dir": "biograph_fdg/10/run_config_biograph_fdg_10_L1SSIMEdge1_32_20251023_095052",
+      "checkpoint": null
+    },
+    {
+      "manufacturer": "Biograph128_Vision Quadra Edge",
+      "drf": 20,
+      "model_dir": "biograph_fdg/20/run_config_biograph_fdg_20_L1SSIMEdge1_32_20251023_095201",
       "checkpoint": null
     },
     {
