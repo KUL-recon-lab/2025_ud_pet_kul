@@ -1,3 +1,4 @@
+import shutil
 import torchio as tio
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -57,7 +58,13 @@ parser.add_argument(
     "--batch_size", type=int, default=20, help="Batch size for inference"
 )
 parser.add_argument(
-    "--odir", type=str, default="pred3", help="sub directory for output predictions"
+    "--odir", type=str, default=None, help="sub directory for output predictions"
+)
+parser.add_argument(
+    "--input_dir",
+    type=str,
+    default="/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData",
+    help="Input directory containing test NIfTI files",
 )
 
 args = parser.parse_args()
@@ -67,7 +74,27 @@ show: bool = not args.nomips
 patch_size: int = args.patch_size
 patch_overlap: int = args.patch_overlap
 batch_size: int = args.batch_size
-odir: str = args.odir
+odir: str | None = args.odir
+test_input_dir: Path = Path(args.input_dir)
+
+if odir is None:
+    out_dir = test_input_dir / "pred_0"
+    i = 1
+    while out_dir.exists():
+        out_dir = test_input_dir / f"pred_{i}"
+        i += 1
+
+out_dir.mkdir(parents=True, exist_ok=True)
+print(f"Writing predictions to {out_dir}")
+
+model_cfg_path = Path(".") / "inference_model_config.json"
+challenge_csv_path = Path(".") / "PET_info_noNORMAL.csv"
+
+target_voxsize_mm: float = 1.65
+
+# copy model_cfg_path to out_dir for reference
+shutil.copy(model_cfg_path, out_dir / "inference_model_config.json")
+shutil.copy(challenge_csv_path, out_dir / "test_data_info.csv")
 
 ################################################################################
 ################################################################################
@@ -75,19 +102,7 @@ odir: str = args.odir
 ################################################################################
 ################################################################################
 
-target_voxsize_mm: float = 1.65
-
-test_input_dir = Path(
-    "/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData"
-)
-
-out_dir = test_input_dir / odir
-
-if not out_dir.exists():
-    out_dir.mkdir(parents=True, exist_ok=True)
-
-
-input_df = pd.read_csv("PET_info_noNORMAL.csv")
+input_df = pd.read_csv(challenge_csv_path)
 
 # filter to only SubjectID and DoseReductionFactor if specified
 if sid != -1:
@@ -113,10 +128,9 @@ input_df["suv_fac"] = 1000 * input_df["PatientWeight_kg"] / input_df["A"]
 ################################################################################
 
 # load models from inference_model_config.json
-cfg_path = Path(__file__).parent / "inference_model_config.json"
-if not cfg_path.exists():
-    raise FileNotFoundError(f"Missing config: {cfg_path}")
-with cfg_path.open("r", encoding="utf-8") as f:
+if not model_cfg_path.exists():
+    raise FileNotFoundError(f"Missing config: {model_cfg_path}")
+with model_cfg_path.open("r", encoding="utf-8") as f:
     cfg = json.load(f)
 
 base_dir = cfg.get("model_mdir")
@@ -179,6 +193,12 @@ for entry in cfg.get("models", []):
     model_dict[(manuf, drf)] = model_path
     print("configured model:", (manuf, drf), "->", model_path)
 
+# save model_dict to out_dir for reference
+with (out_dir / "used_models.json").open("w", encoding="utf-8") as f:
+    json.dump(
+        {f"{k[0]}_DRF{k[1]:03}": str(v) for k, v in model_dict.items()}, f, indent=4
+    )
+
 ################################################################################
 ################################################################################
 # (3) setup the resampling and intensity transform we need (data preprocessing)
@@ -235,8 +255,12 @@ for i, row in input_df.iterrows():
     nii = nib.Nifti1Image(
         subject["output"].data.numpy().squeeze(), subject["output"].affine
     )
-    nii.header["descrip"] = str(model_path).encode("utf-8")[-80:]
-    nib.save(nii, str(out_dir / row["NiftiFileName"]))
+    nii.header["descrip"] = str(Path(model_path.parent.name[11:]) / model_path.name)[
+        :80
+    ]
+    nii_file_path = out_dir / row["NiftiFileName"]
+    nib.save(nii, str(nii_file_path))
+    print(f"Wrote prediction to {nii_file_path}")
 
     ###
     if show:
@@ -302,16 +326,8 @@ for i, row in input_df.iterrows():
 
         fig2.savefig(
             mip_out_dir
-            / f"zz{row['SubjectID']}_{row['DoseReductionFactor']:03}.mip2.png",
+            / f"logcompressed_{row['SubjectID']}_{row['DoseReductionFactor']:03}.mip2.png",
             dpi=100,
         )
         fig2.show()
         plt.close(fig2)
-
-        # vi1 = pv.ThreeAxisViewer(inp, imshow_kwargs=dict(vmin=0, vmax=7))
-        # vi2 = pv.ThreeAxisViewer(pred, imshow_kwargs=dict(vmin=0, vmax=7))
-        # vi2 = pv.ThreeAxisViewer(
-        #    pred - inp, imshow_kwargs=dict(vmin=-2, vmax=2, cmap="seismic")
-        # )
-
-        # tmp = input("press enter to continue")
