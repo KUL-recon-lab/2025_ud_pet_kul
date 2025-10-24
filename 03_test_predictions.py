@@ -78,10 +78,10 @@ odir: str | None = args.odir
 test_input_dir: Path = Path(args.input_dir)
 
 if odir is None:
-    out_dir = test_input_dir / "pred_0"
+    out_dir = test_input_dir / "predictions_0"
     i = 1
     while out_dir.exists():
-        out_dir = test_input_dir / f"pred_{i}"
+        out_dir = test_input_dir / f"predictions_{i}"
         i += 1
 
 out_dir.mkdir(parents=True, exist_ok=True)
