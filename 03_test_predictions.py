@@ -141,27 +141,32 @@ model_dict = {}
 for entry in cfg.get("models", []):
     manuf = entry["manufacturer"]
     drf = int(entry["drf"])
-    hf_model_name = entry["hf_model"]
 
     if entry.get("checkpoint") is None:
-        # if no checkpoint specified, find best from val_loss.csv
-        val_loss_file = hf_hub_download(hf_model_name, filename="val_loss.csv")
-        val_loss_data = np.loadtxt(val_loss_file, delimiter=",")
-        epochs = val_loss_data[:, 0].astype(int)
-        val_loss = val_loss_data[:, 1]
-        best_row = int(np.nanargmin(val_loss)) + 1
-        best_epoch = int(epochs[np.nanargmin(val_loss)])
+        # if no explicit checkpoint specified, use model from huggingface hub
+        hf_model_name = entry["hf_model"]
+        if entry.get("hf_epoch") is None:
+            # if no epoch to use is specified, find best from val_loss.csv
+            val_loss_file = hf_hub_download(hf_model_name, filename="val_loss.csv")
+            val_loss_data = np.loadtxt(val_loss_file, delimiter=",")
+            epochs = val_loss_data[:, 0].astype(int)
+            val_loss = val_loss_data[:, 1]
+            best_row = int(np.nanargmin(val_loss)) + 1
+            best_epoch = int(epochs[np.nanargmin(val_loss)])
 
-        if best_row != best_epoch:
-            raise ValueError(
-                f"Epoch mismatch in {val_loss_file}: row {best_row} vs epoch {best_epoch}"
-            )
+            if best_row != best_epoch:
+                raise ValueError(
+                    f"Epoch mismatch in {val_loss_file}: row {best_row} vs epoch {best_epoch}"
+                )
 
-        ckpt = f"model_{best_epoch:04}_scripted.pt"
+            ckpt = f"model_{best_epoch:04}_scripted.pt"
+        else:
+            ckpt = entry["checkpoint"]
+
+        model_path = Path(hf_hub_download(hf_model_name, filename=ckpt))
     else:
-        ckpt = entry["checkpoint"]
+        model_path = Path(entry["checkpoint"])
 
-    model_path = Path(hf_hub_download(hf_model_name, filename=ckpt))
     model_dict[(manuf, drf)] = model_path
     print("configured model:", (manuf, drf), "->", model_path)
 

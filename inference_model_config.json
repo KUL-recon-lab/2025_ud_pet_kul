@@ -1,74 +1,73 @@
 {
-  "model_mdir": "denoising_models",
   "models": [
     {
       "manufacturer": "uEXPLORER",
       "drf": 4,
-      "model_dir": "uexp_fdg/4/run_config_uexp_fdg_4_L1SSIMEdge1_32_20251023_092712",
       "hf_model": "gschramm/2025-udpet-logsuv-uexp-fdg-4",
+      "hf_epoch": null,
       "checkpoint": null
     },
     {
       "manufacturer": "uEXPLORER",
       "drf": 10,
-      "model_dir": "uexp_fdg/10/run_config_uexp_fdg_10_L1SSIMEdge1_32_20251023_073510",
       "hf_model": "gschramm/2025-udpet-logsuv-uexp-fdg-10",
+      "hf_epoch": null,
       "checkpoint": null
     },
     {
       "manufacturer": "uEXPLORER",
       "drf": 20,
-      "model_dir": "uexp_fdg/20/run_config_uexp_fdg_20_L1SSIMEdge1_32_20251022_180409",
       "hf_model": "gschramm/2025-udpet-logsuv-uexp-fdg-20",
+      "hf_epoch": null,
       "checkpoint": null
     },
     {
       "manufacturer": "uEXPLORER",
       "drf": 50,
-      "model_dir": "uexp_fdg/50/run_config_uexp_fdg_50_L1SSIMEdge1_32_20251022_180405",
       "hf_model": "gschramm/2025-udpet-logsuv-uexp-fdg-50",
+      "hf_epoch": null,
       "checkpoint": null
     },
     {
       "manufacturer": "uEXPLORER",
       "drf": 100,
-      "model_dir": "uexp_fdg/100/run_config_uexp_fdg_100_L1SSIMEdge1_32_20251022_210418",
       "hf_model": "gschramm/2025-udpet-logsuv-uexp-fdg-100",
+      "hf_epoch": null,
       "checkpoint": null
     },
     {
       "manufacturer": "Biograph128_Vision Quadra Edge",
       "drf": 4,
-      "model_dir": "biograph_fdg/4/run_config_biograph_fdg_4_L1SSIMEdge1_32_20251023_222125",
       "hf_model": "gschramm/2025-udpet-logsuv-biograph-fdg-4",
+      "hf_epoch": null,
       "checkpoint": null
     },
     {
       "manufacturer": "Biograph128_Vision Quadra Edge",
       "drf": 10,
-      "model_dir": "biograph_fdg/10/run_config_biograph_fdg_10_L1SSIMEdge1_32_20251023_095052",
       "hf_model": "gschramm/2025-udpet-logsuv-biograph-fdg-10",
+      "hf_epoch": null,
       "checkpoint": null
     },
     {
       "manufacturer": "Biograph128_Vision Quadra Edge",
       "drf": 20,
-      "model_dir": "biograph_fdg/20/run_config_biograph_fdg_20_L1SSIMEdge1_32_20251023_095201",
       "hf_model": "gschramm/2025-udpet-logsuv-biograph-fdg-20",
+      "hf_epoch": null,
       "checkpoint": null
     },
     {
       "manufacturer": "Biograph128_Vision Quadra Edge",
       "drf": 50,
-      "model_dir": "biograph_fdg/50/run_config_biograph_fdg_50_L1SSIMEdge1_32_20251022_170528",
       "hf_model": "gschramm/2025-udpet-logsuv-biograph-fdg-50",
+      "hf_epoch": null,
       "checkpoint": null
     },
     {
       "manufacturer": "Biograph128_Vision Quadra Edge",
       "drf": 100,
-      "model_dir": "biograph_fdg/100/run_config_biograph_fdg_100_L1SSIMEdge1_32_20251022_170617",
       "hf_model": "gschramm/2025-udpet-logsuv-biograph-fdg-100",
+      "hf_epoch": null,
       "checkpoint": null
     }
   ]
