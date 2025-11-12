@@ -1,4 +1,4 @@
-name: 2025_udpet
+name: 2025_udpet_logsuv
 channels:
   - conda-forge
 dependencies:
@@ -6,8 +6,8 @@ dependencies:
   - pytorch=2.8.*
   - torchio=0.20.*
   - pymirc=0.30.*
-  - wandb=0.22.*
   - indexed_gzip=1.10.*
   - ipython=9.6.*
   - pandas=2.3.*
   - pytorch-ignite=0.5.*
+  - huggingface_hub=1.1.*
