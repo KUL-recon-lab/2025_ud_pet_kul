@@ -10,6 +10,7 @@ import nibabel as nib
 from scipy.ndimage import gaussian_filter
 from pathlib import Path
 from data import SUVLogCompress, patch_inference
+from huggingface_hub import hf_hub_download
 import matplotlib as mpl
 
 mpl.rcParams.update(
@@ -127,69 +128,40 @@ input_df["suv_fac"] = 1000 * input_df["PatientWeight_kg"] / input_df["A"]
 ################################################################################
 ################################################################################
 
-# load models from inference_model_config.json
+model_cfg_path = Path(".") / "inference_model_config.json"
+
 if not model_cfg_path.exists():
     raise FileNotFoundError(f"Missing config: {model_cfg_path}")
 with model_cfg_path.open("r", encoding="utf-8") as f:
     cfg = json.load(f)
 
-base_dir = cfg.get("model_mdir")
-if base_dir:
-    base_dir = Path(base_dir)
-    if not base_dir.is_absolute():
-        base_dir = (Path(__file__).parent / base_dir).resolve()
-else:
-    base_dir = Path(__file__).parent
-
+# load models from huggingface hub
+# the json file model_cfg_path determines which model to use for which (manufacturer, drf) pair
 model_dict = {}
 for entry in cfg.get("models", []):
     manuf = entry["manufacturer"]
     drf = int(entry["drf"])
-    model_dir = Path(entry["model_dir"])
-    if not model_dir.is_absolute():
-        model_dir = (base_dir / model_dir).resolve()
+    hf_model_name = entry["hf_model"]
 
-    checkpoint = entry.get("checkpoint")
-    if checkpoint:
-        cp = Path(checkpoint)
-        if not cp.is_absolute():
-            cp = (model_dir / cp).resolve()
-        model_path = cp
+    if entry.get("checkpoint") is None:
+        # if no checkpoint specified, find best from val_loss.csv
+        val_loss_file = hf_hub_download(hf_model_name, filename="val_loss.csv")
+        val_loss_data = np.loadtxt(val_loss_file, delimiter=",")
+        epochs = val_loss_data[:, 0].astype(int)
+        val_loss = val_loss_data[:, 1]
+        best_row = int(np.nanargmin(val_loss)) + 1
+        best_epoch = int(epochs[np.nanargmin(val_loss)])
+
+        if best_row != best_epoch:
+            raise ValueError(
+                f"Epoch mismatch in {val_loss_file}: row {best_row} vs epoch {best_epoch}"
+            )
+
+        ckpt = f"model_{best_epoch:04}_scripted.pt"
     else:
-        val_loss_file = model_dir / "val_loss.csv"
-        if val_loss_file.exists():
-            val_loss_data = np.loadtxt(val_loss_file, delimiter=",")
-            epochs = val_loss_data[:, 0].astype(int)
-            val_loss = val_loss_data[:, 1]
-            best_row = int(np.nanargmin(val_loss)) + 1
-            best_epoch = int(epochs[np.nanargmin(val_loss)])
+        ckpt = entry["checkpoint"]
 
-            if best_row != best_epoch:
-                raise ValueError(
-                    f"Epoch mismatch in {val_loss_file}: row {best_row} vs epoch {best_epoch}"
-                )
-            model_path = (model_dir / f"model_{best_epoch:04}_scripted.pt").resolve()
-        else:
-            # choose best epoch by validation NRMSE from train_metrics.csv
-            metrics_path = model_dir / "train_metrics.csv"
-            if not metrics_path.exists():
-                raise FileNotFoundError(
-                    f"Missing metrics at {metrics_path} for {manuf} DRF {drf}"
-                )
-            metrics = np.loadtxt(metrics_path, delimiter=",")
-            # assume val_nrmse is the second-to-last column
-            val_nrmse = metrics[:, -2]
-            epochs = metrics[:, 0].astype(int)
-            best_row = int(np.nanargmin(val_nrmse)) + 1
-            best_epoch = int(epochs[np.nanargmin(val_nrmse)])
-
-            if best_row != best_epoch:
-                raise ValueError(
-                    f"Epoch mismatch in {metrics_path}: row {best_row} vs epoch {best_epoch}"
-                )
-
-            model_path = (model_dir / f"model_{best_epoch:04}_scripted.pt").resolve()
-
+    model_path = Path(hf_hub_download(hf_model_name, filename=ckpt))
     model_dict[(manuf, drf)] = model_path
     print("configured model:", (manuf, drf), "->", model_path)
 
@@ -255,9 +227,7 @@ for i, row in input_df.iterrows():
     nii = nib.Nifti1Image(
         subject["output"].data.numpy().squeeze(), subject["output"].affine
     )
-    nii.header["descrip"] = str(Path(model_path.parent.name[11:]) / model_path.name)[
-        :80
-    ]
+    nii.header["descrip"] = str(model_path.parents[2].name)[:80]
     nii_file_path = out_dir / row["NiftiFileName"]
     nib.save(nii, str(nii_file_path))
     print(f"Wrote prediction to {nii_file_path}")
