@@ -5,16 +5,40 @@
 Create and activate the conda environment using the provided `environment.yml` file:
 ```bash
 conda env create -f environment.yml
-conda activate 2025_udpet
+conda activate 2025_udpet_logsuv
 ```
 
 ## Prediction of 2025 UD-PET Challenge Test Data
 
 ```bash
-python 03_test_predictions.py --input_dir <path_to_udp_test_data>
+python 03_test_predictions.py <path_to_udp_test_data>
 ```
 
-Make sure to adjust the models to be used in `inference_model_config.json`.
+where `<path_to_udp_test_data>` is the path to the directory containing the 2025 UD-PET challenge 
+test data in NIfTI format and should look like:
+
+```bash
+.
+|-- Anonymous-01_DRF-100.nii.gz
+|-- Anonymous-01_DRF-10.nii.gz
+|-- Anonymous-01_DRF-20.nii.gz
+|-- Anonymous-01_DRF-4.nii.gz
+|-- Anonymous-01_DRF-50.nii.gz
+...
+|-- Anonymous-50_DRF-100.nii.gz
+|-- Anonymous-50_DRF-10.nii.gz
+|-- Anonymous-50_DRF-20.nii.gz
+|-- Anonymous-50_DRF-4.nii.gz
+|-- Anonymous-50_DRF-50.nii.gz
+```
+
+
+`inference_model_config.json` contains the configuration of the models to be used for inference.
+By default, the pre-trained models that we used for the 2025 UD-PET challenge are specified there.
+`hf_epoch` can be used to specify a particular epoch to use for inference, if `null` the best epoch
+as determined from the validation NRMSE is used.
+
+You can you your own models by changing the `checkpoint` entry.
 
 ## Training of denoising models
 

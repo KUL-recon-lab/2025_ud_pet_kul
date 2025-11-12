@@ -25,6 +25,11 @@ mpl.rcParams.update(
 # replace hard-coded vars with argparse (use parse_known_args so importing in notebooks/IDE won't fail)
 parser = argparse.ArgumentParser(description="Run test predictions")
 parser.add_argument(
+    "input_dir",
+    type=str,
+    help="Input directory containing test nifti files",
+)
+parser.add_argument(
     "--sid",
     type=int,
     default=-1,
@@ -61,12 +66,7 @@ parser.add_argument(
 parser.add_argument(
     "--odir", type=str, default=None, help="sub directory for output predictions"
 )
-parser.add_argument(
-    "--input_dir",
-    type=str,
-    default="/uz/data/Admin/ngeworkingresearch/schramm_lab/data/2025_ud_pet_challenge/TestData",
-    help="Input directory containing test NIfTI files",
-)
+
 
 args = parser.parse_args()
 sid: int = args.sid
