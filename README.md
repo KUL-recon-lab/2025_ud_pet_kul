@@ -2,9 +2,9 @@
 
 ## Setup
 
-Create and activate the conda environment using the provided `environment.yml` file:
+Create and activate the conda environment using the provided `environment.yaml` file:
 ```bash
-conda env create -f environment.yml
+conda env create -f environment.yaml
 conda activate 2025_udpet_logsuv
 ```
 
